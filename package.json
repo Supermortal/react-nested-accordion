@@ -117,8 +117,8 @@
       "node"
     ],
     "watchPlugins": [
-      "C:\\Users\\chpink\\Home\\sandbox\\react-nested-accordion\\react-nested-accordion\\node_modules\\jest-watch-typeahead\\filename.js",
-      "C:\\Users\\chpink\\Home\\sandbox\\react-nested-accordion\\react-nested-accordion\\node_modules\\jest-watch-typeahead\\testname.js"
+      "<rootDir>\\node_modules\\jest-watch-typeahead\\filename.js",
+      "<rootDir>\\node_modules\\jest-watch-typeahead\\testname.js"
     ]
   },
   "babel": {
