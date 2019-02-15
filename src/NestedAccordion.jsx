@@ -5,27 +5,34 @@ export default class NestedAccordion extends React.Component {
 
     constructor(props) {
         super(props);
+
         (new Promise((resolve, reject) => {
             this.props.getItems(null, resolve, reject);
         }))
-            .then(items => {
-                const level = 0;
-                const {
-                    itemElements,
-                    contents
-                } = this.prepElementArrays(this.state.itemElements, this.state.contents, level);
-                const updateObject = this.createItemElements(items, itemElements, contents, level);
-                this.setState(updateObject);
-            });
+            .then(this.initialGetItemsCallback);
+
         this.state = {
             itemElements: [],
             contents: [],
             selectedIndicies: [],
             storedItems: []
         };
+
         this.createItemElements.bind(this);
         this.clearAll.bind(this);
         this.handleSecondClick.bind(this);
+        this.initialGetItemsCallback.bind(this);
+    }
+
+    initialGetItemsCallback(items) {
+        const level = 0;
+        const {
+            itemElements,
+            contents
+        } = this.prepElementArrays(this.state.itemElements, this.state.contents, level);
+        const updateObject = this.createItemElements(items, itemElements, contents, level);
+
+        this.setState(updateObject);
     }
 
     prepElementArrays(itemElements, contents, level) {
