@@ -1,7 +1,16 @@
 {
   "name": "react-nested-accordion",
   "version": "0.1.0",
-  "private": true,
+  "description": "A dynamic nested accordion component for React",
+  "main": "index.js",
+  "keywords": [
+    "react",
+    "nested",
+    "accordion",
+    "dynamic"
+  ],
+  "author": "Christopher Pink",
+  "license": "MIT",
   "dependencies": {
     "@babel/core": "7.2.2",
     "@svgr/webpack": "4.1.0",
