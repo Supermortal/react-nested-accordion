@@ -13,5 +13,18 @@ it('renders without crashing', () => {
 });
 
 it('calls get items on render', () => {
+    const testObject = {
+        getItems(item) {
 
+        }
+    };
+    const spy = jest.spyOn(testObject, 'getItems');
+
+    const div = document.createElement('div');
+    ReactDOM.render(<NestedAccordion getItems={testObject.getItems} />, div);
+    ReactDOM.unmountComponentAtNode(div);
+
+    expect(spy).toHaveBeenCalled();
+
+    spy.mockRestore();
 });
