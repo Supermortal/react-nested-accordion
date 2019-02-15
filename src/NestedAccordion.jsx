@@ -25,6 +25,7 @@ export default class NestedAccordion extends React.Component {
 
     initialGetItemsCallback(items) {
         const level = 0;
+
         const {
             itemElements,
             contents

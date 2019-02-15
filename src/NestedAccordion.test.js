@@ -94,3 +94,49 @@ it('processes items correctly in initialGetItemsCallback', () => {
     const secondContentWrapper = shallow(secondContent);
     expect(secondContentWrapper.html()).toEqual("<p>Test2</p>");
 });
+
+it('preps element arrays correctly', () => {
+    const testItems = [
+        { label: "Test1" },
+        { label: "Test2" }
+    ];
+
+    const testObject = {
+        getItems(item, resolve, reject) {
+
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        }
+    };
+
+    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
+
+    const level = 0;
+    const initialItemElements = [];
+    const initialContents = [];
+
+    const {
+        itemElements,
+        contents
+    } = accordionInstance.prepElementArrays(initialItemElements, initialContents, level);
+
+    expect(itemElements).toHaveLength(1);
+    expect(itemElements[level]).toHaveLength(0);
+
+    expect(contents).toHaveLength(1);
+    expect(itemElements[level]).toHaveLength(0);
+
+    const newLevel = 1;
+
+    const updateObject = accordionInstance.prepElementArrays(itemElements, contents, newLevel);
+
+    expect(updateObject.itemElements).toHaveLength(2);
+    expect(updateObject.itemElements[newLevel]).toHaveLength(0);
+
+    expect(updateObject.contents).toHaveLength(2);
+    expect(updateObject.contents[newLevel]).toHaveLength(0);
+});
