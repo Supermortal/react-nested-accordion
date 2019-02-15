@@ -6,10 +6,14 @@ export default class NestedAccordion extends React.Component {
     constructor(props) {
         super(props);
 
+        this.createItemElements.bind(this);
+        this.clearAll.bind(this);
+        this.handleSecondClick.bind(this);
+
         (new Promise((resolve, reject) => {
             this.props.getItems(null, resolve, reject);
         }))
-            .then(this.initialGetItemsCallback);
+            .then(this.initialGetItemsCallback.bind(this));
 
         this.state = {
             itemElements: [],
@@ -17,11 +21,6 @@ export default class NestedAccordion extends React.Component {
             selectedIndicies: [],
             storedItems: []
         };
-
-        this.createItemElements.bind(this);
-        this.clearAll.bind(this);
-        this.handleSecondClick.bind(this);
-        this.initialGetItemsCallback.bind(this);
     }
 
     initialGetItemsCallback(items) {
