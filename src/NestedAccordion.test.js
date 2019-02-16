@@ -96,10 +96,6 @@ it('processes items correctly in initialGetItemsCallback', () => {
 });
 
 it('preps element arrays correctly', () => {
-    const testItems = [
-        { label: "Test1" },
-        { label: "Test2" }
-    ];
 
     const testObject = {
         getItems(item, resolve, reject) {
@@ -139,4 +135,88 @@ it('preps element arrays correctly', () => {
 
     expect(updateObject.contents).toHaveLength(2);
     expect(updateObject.contents[newLevel]).toHaveLength(0);
+});
+
+it('creates item element correctly', () => {
+
+    const testObject = {
+        getItems(item, resolve, reject) {
+
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        }
+    };
+
+    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
+
+    const item = {
+        label: "Test Item"
+    };
+    const index = 0;
+    const level = 0;
+    const content = shallow(<p>Test Item</p>);
+
+    const itemElement = accordionInstance.createItemElement(item, index, level, content);
+    const itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test Item</p></div></li>");
+});
+
+it('creates item elements correctly', () => {
+
+    const testObject = {
+        getItems(item, resolve, reject) {
+
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        }
+    };
+
+    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
+
+    const items = [
+        { label: "Test Item 1" },
+        { label: "Test Item 2" },
+        { label: "Test Item 3" },
+        { label: "Test Item 4" }
+    ];
+
+    const initialContents = [
+        []
+    ];
+
+    const initialItemElements = [
+        []
+    ];
+
+    const level = 0;
+
+    const { itemElements, contents } = accordionInstance.createItemElements(items, initialItemElements, initialContents, level);
+
+    expect(itemElements).toBeDefined();
+    expect(itemElements).toHaveLength(1);
+    expect(itemElements[level]).toHaveLength(4);
+
+    const firstItemElement = itemElements[level][0];
+    expect(firstItemElement).toBeDefined();
+    const firstItemElementWrapper = shallow(firstItemElement);
+    expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test Item 1</p></div></li>");
+
+    expect(contents).toBeDefined();
+    expect(contents).toHaveLength(1);
+    expect(contents[level]).toHaveLength(4);
+
+    const firstContent = contents[level][0];
+    expect(firstContent).toBeDefined();
+    const firstContentWrapper = shallow(firstContent);
+    expect(firstContentWrapper.html()).toEqual("<p>Test Item 1</p>");
 });
