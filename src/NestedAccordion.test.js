@@ -41,7 +41,7 @@ it('calls get items on render', () => {
     spy.mockRestore();
 });
 
-it('processes items correctly in initialGetItemsCallback', () => {
+it('processes items correctly in initialGetItemsProcessing', () => {
 
     const testItems = [
         { label: "Test1" },
@@ -64,33 +64,36 @@ it('processes items correctly in initialGetItemsCallback', () => {
     const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
     const accordionInstance = accordion.instance();
 
-    accordionInstance.initialGetItemsCallback(testItems);
+    let stateObject = {
+        itemElements: [],
+        contents: []
+    };
 
-    const accordionState = accordion.state();
+    stateObject = accordionInstance.initialGetItemsProcessing(testItems, stateObject)
 
-    expect(accordionState.itemElements).toBeDefined();
-    expect(accordionState.itemElements).toHaveLength(1);
-    expect(accordionState.itemElements[0]).toHaveLength(2);
+    expect(stateObject.itemElements).toBeDefined();
+    expect(stateObject.itemElements).toHaveLength(1);
+    expect(stateObject.itemElements[0]).toHaveLength(2);
 
-    const firstItemElement = accordionState.itemElements[0][0];
+    const firstItemElement = stateObject.itemElements[0][0];
     const firstItemElementWrapper = shallow(firstItemElement);
     expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test1</p></div></li>");
 
-    const secondItemElement = accordionState.itemElements[0][1];
+    const secondItemElement = stateObject.itemElements[0][1];
     const secondItemElementWrapper = shallow(secondItemElement);
     expect(secondItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test2</p></div></li>");
 
     expect(getItemContentSpy).toBeCalledTimes(2);
 
-    expect(accordionState.contents).toBeDefined();
-    expect(accordionState.contents).toHaveLength(1);
-    expect(accordionState.contents[0]).toHaveLength(2);
+    expect(stateObject.contents).toBeDefined();
+    expect(stateObject.contents).toHaveLength(1);
+    expect(stateObject.contents[0]).toHaveLength(2);
 
-    const firstContent = accordionState.contents[0][0];
+    const firstContent = stateObject.contents[0][0];
     const firstContentWrapper = shallow(firstContent);
     expect(firstContentWrapper.html()).toEqual("<p>Test1</p>");
 
-    const secondContent = accordionState.contents[0][1];
+    const secondContent = stateObject.contents[0][1];
     const secondContentWrapper = shallow(secondContent);
     expect(secondContentWrapper.html()).toEqual("<p>Test2</p>");
 });

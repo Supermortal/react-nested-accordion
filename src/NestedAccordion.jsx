@@ -11,11 +11,16 @@ export default class NestedAccordion extends React.Component {
         this.handleSecondClick.bind(this);
         this.onItemClickPreprocess.bind(this);
         this.onItemClickPostprocess.bind(this);
+        this.initialGetItemsProcessing.bind(this);
 
         (new Promise((resolve, reject) => {
             this.props.getItems(null, resolve, reject);
         }))
-            .then(this.initialGetItemsCallback.bind(this));
+            .then(items => {
+
+                const updateObject = this.initialGetItemsProcessing(items, this.state);
+                this.setState(updateObject);
+            });
 
         this.state = {
             itemElements: [],
@@ -25,16 +30,22 @@ export default class NestedAccordion extends React.Component {
         };
     }
 
-    initialGetItemsCallback(items) {
+    initialGetItemsProcessing(items, stateObject) {
+
+        const itemElementsArgument = stateObject.itemElements;
+        const contentsArgument = stateObject.contents;
+        const selectedIndicies = [];
+        const storedItems = [];
+
         const level = 0;
 
+        const updateObject = this.prepElementArrays(itemElementsArgument, contentsArgument, level);
         const {
             itemElements,
             contents
-        } = this.prepElementArrays(this.state.itemElements, this.state.contents, level);
-        const updateObject = this.createItemElements(items, itemElements, contents, level);
+        } = this.createItemElements(items, updateObject.itemElements, updateObject.contents, level);
 
-        this.setState(updateObject);
+        return { itemElements, contents, selectedIndicies, storedItems };
     }
 
     prepElementArrays(itemElements, contents, level) {
@@ -166,25 +177,13 @@ export default class NestedAccordion extends React.Component {
     }
 
     clearAll() {
-        const replacementState = {
-            itemElements: [],
-            contents: [],
-            selectedIndicies: [],
-            storedItems: []
-        };
         (new Promise((resolve, reject) => {
             this.props.getItems(null, resolve, reject);
         }))
             .then(items => {
-                const level = 0;
-                const {
-                    itemElements,
-                    contents
-                } = this.prepElementArrays(replacementState.itemElements, replacementState.contents, level);
-                const updateObject = this.createItemElements(items, itemElements, contents, level);
-                replacementState.itemElements = updateObject.itemElements;
-                replacementState.contents = updateObject.contents;
-                this.setState(replacementState);
+
+                const updateObject = this.initialGetItemsProcessing(items, this.state);
+                this.setState(updateObject);
             });
     }
 
