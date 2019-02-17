@@ -75,35 +75,47 @@ export default class NestedAccordion extends React.Component {
 
     onItemClick(item, index, level) {
         return (e) => {
+
             let selectedIndicies = this.state.selectedIndicies;
+
             const hasSecondClick = this.handleSecondClick(selectedIndicies, item, index, level);
             if (hasSecondClick) return;
+
             let {
                 itemElements,
                 contents
             } = this.cleanUpOldItemElements(this.state.itemElements,
                 this.state.contents, this.state.storedItems, this.state.selectedIndicies, level);
+
             let storedItems = this.state.storedItems;
             selectedIndicies = this.setSelectedIndex(selectedIndicies, index, level);
             storedItems = this.setStoredItem(storedItems, item, level);
             (new Promise((resolve, reject) => {
                 this.props.getItems(item, resolve, reject);
             }))
-                .then(items => {
-                    const newLevel = level + 1;
-                    let updateObject = this.prepElementArrays(itemElements, contents, newLevel);
-                    updateObject = this.createItemElements(items, updateObject.itemElements, updateObject.contents, newLevel);
-                    itemElements = updateObject.itemElements;
-                    contents = updateObject.contents;
-                    itemElements = this.replaceOldElements(selectedIndicies, storedItems, itemElements, contents);
-                    this.setState({
-                        itemElements,
-                        contents,
-                        selectedIndicies,
-                        storedItems
-                    });
-                });
+                .then(this.onItemClickGetItemsCallback(itemElements, contents, selectedIndicies, storedItems, level));
         };
+    }
+
+    onItemClickGetItemsCallback(itemElementsArgument, contentsArgument, selectedIndicies, storedItems, level) {
+        return (items) => {
+
+            const newLevel = level + 1;
+
+            let updateObject = this.prepElementArrays(itemElementsArgument, contentsArgument, newLevel);
+            updateObject = this.createItemElements(items, updateObject.itemElements, updateObject.contents, newLevel);
+            let itemElements = updateObject.itemElements;
+            const contents = updateObject.contents;
+
+            itemElements = this.replaceOldElements(selectedIndicies, storedItems, itemElements, contents);
+
+            this.setState({
+                itemElements,
+                contents,
+                selectedIndicies,
+                storedItems
+            });
+        }
     }
 
     handleSecondClick(selectedIndicies, item, index, level) {
