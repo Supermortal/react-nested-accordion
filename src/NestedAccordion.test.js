@@ -262,41 +262,64 @@ it('checks for second click correctly', () => {
     expect(isSecondClick).toBeFalsy();
 });
 
-// it('handles second click correctly', () => {
+it('handles second click correctly', () => {
 
-//     const testObject = {
-//         getItems(item, resolve, reject) {
+    const testObject = {
+        getItems(item, resolve, reject) {
 
-//         },
-//         getItemContent(item) {
-//             return (
-//                 <p>{item.label}</p>
-//             );
-//         },
-//         onChange(item) {
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        },
+        onChange(item) {
 
-//         }
-//     };
+        }
+    };
 
-//     const onChangeSpy = jest.spyOn(testObject, 'onChange');
+    const onChangeSpy = jest.spyOn(testObject, 'onChange');
+    const clearAllSpy = jest.spyOn(NestedAccordion.prototype, 'clearAll');
 
-//     const accordion = shallow(<NestedAccordion
-//         getItems={testObject.getItems}
-//         onChange={testObject.onChange}
-//         getItemContent={testObject.getItemContent} />);
-//     const accordionInstance = accordion.instance();
+    const accordion = shallow(<NestedAccordion
+        getItems={testObject.getItems}
+        onChange={testObject.onChange}
+        getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
 
-//     const selectedIndicies = [];
-//     const item = {
-//         label: "Test Item 1"
-//     };
-//     const index = 0;
-//     const level = 0;
+    const index = 0;
+    const level = 0;
+    const selectedIndicies = [];
+    selectedIndicies[level] = index;
 
-//     accordionInstance.handleSecondClick(selectedIndicies, item, index, level);
+    let hasSecondClick = accordionInstance.handleSecondClick(selectedIndicies, index, level);
 
-//     expect(onChangeSpy).toHaveBeenCalled();
-// });
+    expect(onChangeSpy).toBeCalledTimes(1);
+    expect(clearAllSpy).toBeCalledTimes(1);
+    expect(hasSecondClick).toBeTruthy();
+
+    const otherIndex = 1;
+    selectedIndicies[level] = otherIndex;
+
+    hasSecondClick = accordionInstance.handleSecondClick(selectedIndicies, index, level);
+
+    expect(onChangeSpy).toBeCalledTimes(1);
+    expect(clearAllSpy).toBeCalledTimes(1);
+    expect(hasSecondClick).toBeFalsy();
+
+    const newAccordion = shallow(<NestedAccordion
+        getItems={testObject.getItems}
+        getItemContent={testObject.getItemContent} />);
+    const newAccordionInstance = newAccordion.instance();
+
+    selectedIndicies[level] = index;
+
+    hasSecondClick = newAccordionInstance.handleSecondClick(selectedIndicies, index, level);
+
+    expect(onChangeSpy).toBeCalledTimes(1);
+    expect(clearAllSpy).toBeCalledTimes(2);
+    expect(hasSecondClick).toBeTruthy();
+});
 
 // it('cleans up old items correctly', () => {
 //     expect(false).toBeTruthy();

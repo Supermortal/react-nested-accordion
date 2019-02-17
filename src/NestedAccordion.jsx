@@ -113,7 +113,7 @@ export default class NestedAccordion extends React.Component {
         const argumentContents = stateObject.contents;
         const argumentStoredItems = stateObject.storedItems;
 
-        const hasSecondClick = this.handleSecondClick(argumentSelectedIndicies, item, index, level);
+        const hasSecondClick = this.handleSecondClick(argumentSelectedIndicies, index, level);
         if (hasSecondClick) return null;
 
         if (this.props.onChange) this.props.onChange(item);
@@ -154,7 +154,7 @@ export default class NestedAccordion extends React.Component {
         };
     }
 
-    handleSecondClick(selectedIndicies, item, index, level) {
+    handleSecondClick(selectedIndicies, index, level) {
 
         let hasSecondClick = false;
 
