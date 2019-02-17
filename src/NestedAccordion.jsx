@@ -9,6 +9,8 @@ export default class NestedAccordion extends React.Component {
         this.createItemElements.bind(this);
         this.clearAll.bind(this);
         this.handleSecondClick.bind(this);
+        this.onItemClickPreprocess.bind(this);
+        this.onItemClickPostprocess.bind(this);
 
         (new Promise((resolve, reject) => {
             this.props.getItems(null, resolve, reject);
@@ -76,66 +78,94 @@ export default class NestedAccordion extends React.Component {
     onItemClick(item, index, level) {
         return (e) => {
 
-            let selectedIndicies = this.state.selectedIndicies;
+            let updateObject = this.onItemClickPreprocess(item, index, level, this.state);
+            if (!updateObject) return;
 
-            const hasSecondClick = this.handleSecondClick(selectedIndicies, item, index, level);
-            if (hasSecondClick) return;
+            this.setState(updateObject);
 
-            let {
-                itemElements,
-                contents
-            } = this.cleanUpOldItemElements(this.state.itemElements,
-                this.state.contents, this.state.storedItems, this.state.selectedIndicies, level);
-
-            let storedItems = this.state.storedItems;
-            selectedIndicies = this.setSelectedIndex(selectedIndicies, index, level);
-            storedItems = this.setStoredItem(storedItems, item, level);
             (new Promise((resolve, reject) => {
                 this.props.getItems(item, resolve, reject);
             }))
-                .then(this.onItemClickGetItemsCallback(itemElements, contents, selectedIndicies, storedItems, level));
+                .then((items) => {
+
+                    updateObject = this.onItemClickPostprocess(level, items, updateObject);
+
+                    this.setState(updateObject);
+                });
         };
     }
 
-    onItemClickGetItemsCallback(itemElementsArgument, contentsArgument, selectedIndicies, storedItems, level) {
-        return (items) => {
+    onItemClickPreprocess(item, index, level, stateObject) {
 
-            const newLevel = level + 1;
+        const argumentSelectedIndicies = stateObject.selectedIndicies;
+        const argumentItemElements = stateObject.itemElements;
+        const argumentContents = stateObject.contents;
+        const argumentStoredItems = stateObject.storedItems;
 
-            let updateObject = this.prepElementArrays(itemElementsArgument, contentsArgument, newLevel);
-            updateObject = this.createItemElements(items, updateObject.itemElements, updateObject.contents, newLevel);
-            let itemElements = updateObject.itemElements;
-            const contents = updateObject.contents;
+        const hasSecondClick = this.handleSecondClick(argumentSelectedIndicies, item, index, level);
+        if (hasSecondClick) return null;
 
-            itemElements = this.replaceOldElements(selectedIndicies, storedItems, itemElements, contents);
+        const {
+            itemElements,
+            contents
+        } = this.cleanUpOldItemElements(argumentItemElements,
+            argumentContents, argumentStoredItems, argumentSelectedIndicies, level);
 
-            this.setState({
-                itemElements,
-                contents,
-                selectedIndicies,
-                storedItems
-            });
-        }
+        const selectedIndicies = this.setSelectedIndex(argumentSelectedIndicies, index, level);
+        const storedItems = this.setStoredItem(argumentStoredItems, item, level);
+
+        return { itemElements, contents, selectedIndicies, storedItems };
+    }
+
+    onItemClickPostprocess(level, items, stateObject) {
+
+        const itemElementsArgument = stateObject.itemElements;
+        const contentsArgument = stateObject.contents;
+        const selectedIndicies = stateObject.selectedIndicies;
+        const storedItems = stateObject.storedItems;
+
+        const newLevel = level + 1;
+
+        let updateObject = this.prepElementArrays(itemElementsArgument, contentsArgument, newLevel);
+        updateObject = this.createItemElements(items, updateObject.itemElements, updateObject.contents, newLevel);
+        let itemElements = updateObject.itemElements;
+        const contents = updateObject.contents;
+
+        itemElements = this.replaceOldElements(selectedIndicies, storedItems, itemElements, contents);
+
+        return {
+            itemElements,
+            contents,
+            selectedIndicies,
+            storedItems
+        };
     }
 
     handleSecondClick(selectedIndicies, item, index, level) {
+
         let hasSecondClick = false;
+
         const isSecondClick = this.isSecondClick(selectedIndicies, index, level);
+
         if (this.props.onChange) {
+
             if (isSecondClick) {
                 this.props.onChange(null);
                 this.clearAll();
                 hasSecondClick = true;
-            } else {
+            }
+            else {
                 this.props.onChange(item);
             }
         }
+
         return hasSecondClick;
     }
 
     isSecondClick(selectedIndicies, index, level) {
         const oldLevelIndex = selectedIndicies[level];
         const isSecondClick = oldLevelIndex === index && level === (selectedIndicies.length - 1);
+
         return isSecondClick;
     }
 
