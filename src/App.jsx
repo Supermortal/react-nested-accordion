@@ -3,16 +3,17 @@ import logo from './logo.svg';
 import './App.css';
 
 import NestedAccordion from './NestedAccordion';
-
-const testItems = [
-  { label: "Test1" },
-  { label: "Test2" }
-];
+import { testData } from './testData';
 
 class App extends Component {
 
   getItems(item, resolve, reject) {
-    resolve(testItems);
+    if (!item) {
+      resolve(testData.get("root"));
+      return;
+    }
+
+    resolve(testData.get(item.label));
   }
 
   getItemContent(item) {
@@ -21,10 +22,19 @@ class App extends Component {
     );
   }
 
+  onChange() {
+    return item => {
+      console.log(item);
+    }
+  }
+
   render() {
     return (
       <div className="App">
-        <NestedAccordion getItems={this.getItems} getItemContent={this.getItemContent} />
+        <NestedAccordion
+          getItems={this.getItems}
+          onChange={this.onChange()}
+          getItemContent={this.getItemContent} />
       </div>
     );
   }

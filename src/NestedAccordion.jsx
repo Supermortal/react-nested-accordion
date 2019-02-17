@@ -87,9 +87,9 @@ export default class NestedAccordion extends React.Component {
                 this.props.getItems(item, resolve, reject);
             }))
                 .then((items) => {
+                    if (!items) return;
 
                     updateObject = this.onItemClickPostprocess(level, items, updateObject);
-
                     this.setState(updateObject);
                 });
         };
@@ -104,6 +104,8 @@ export default class NestedAccordion extends React.Component {
 
         const hasSecondClick = this.handleSecondClick(argumentSelectedIndicies, item, index, level);
         if (hasSecondClick) return null;
+
+        if (this.props.onChange) this.props.onChange(item);
 
         const {
             itemElements,
@@ -147,16 +149,10 @@ export default class NestedAccordion extends React.Component {
 
         const isSecondClick = this.isSecondClick(selectedIndicies, index, level);
 
-        if (this.props.onChange) {
-
-            if (isSecondClick) {
-                this.props.onChange(null);
-                this.clearAll();
-                hasSecondClick = true;
-            }
-            else {
-                this.props.onChange(item);
-            }
+        if (isSecondClick) {
+            this.clearAll();
+            if (this.props.onChange) this.props.onChange(null);
+            hasSecondClick = true;
         }
 
         return hasSecondClick;
