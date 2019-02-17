@@ -220,3 +220,31 @@ it('creates item elements correctly', () => {
     const firstContentWrapper = shallow(firstContent);
     expect(firstContentWrapper.html()).toEqual("<p>Test Item 1</p>");
 });
+
+it('handles second click correctly', () => {
+    expect(false).toBeTruthy();
+});
+
+it('cleans up old items correctly', () => {
+    expect(false).toBeTruthy();
+});
+
+it('sets selected index correctly', () => {
+    expect(false).toBeTruthy();
+});
+
+it('sets stored item correctly', () => {
+    expect(false).toBeTruthy();
+});
+
+it('replaces old elements correctly', () => {
+    expect(false).toBeTruthy();
+});
+
+it('checks for second click correctly', () => {
+    expect(false).toBeTruthy();
+});
+
+it('cleans up array correct', () => {
+    expect(false).toBeTruthy();
+});
