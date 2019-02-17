@@ -5,6 +5,7 @@ import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
 import NestedAccordion from './NestedAccordion';
+import { testData } from './testData';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -224,30 +225,95 @@ it('creates item elements correctly', () => {
     expect(firstContentWrapper.html()).toEqual("<p>Test Item 1</p>");
 });
 
-it('handles second click correctly', () => {
-    expect(false).toBeTruthy();
-});
-
-it('cleans up old items correctly', () => {
-    expect(false).toBeTruthy();
-});
-
-it('sets selected index correctly', () => {
-    expect(false).toBeTruthy();
-});
-
-it('sets stored item correctly', () => {
-    expect(false).toBeTruthy();
-});
-
-it('replaces old elements correctly', () => {
-    expect(false).toBeTruthy();
-});
-
 it('checks for second click correctly', () => {
-    expect(false).toBeTruthy();
+
+    const testObject = {
+        getItems(item, resolve, reject) {
+
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        },
+        onChange(item) {
+
+        }
+    };
+
+    const accordion = shallow(<NestedAccordion
+        getItems={testObject.getItems}
+        onChange={testObject.onChange}
+        getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
+
+    const index = 0;
+    const level = 0;
+    const selectedIndicies = [];
+    selectedIndicies[level] = index;
+
+    let isSecondClick = accordionInstance.isSecondClick(selectedIndicies, index, level);
+    expect(isSecondClick).toBeTruthy();
+
+    const otherIndex = 1;
+    selectedIndicies[level] = otherIndex;
+
+    isSecondClick = accordionInstance.isSecondClick(selectedIndicies, index, level);
+    expect(isSecondClick).toBeFalsy();
 });
 
-it('cleans up array correct', () => {
-    expect(false).toBeTruthy();
-});
+// it('handles second click correctly', () => {
+
+//     const testObject = {
+//         getItems(item, resolve, reject) {
+
+//         },
+//         getItemContent(item) {
+//             return (
+//                 <p>{item.label}</p>
+//             );
+//         },
+//         onChange(item) {
+
+//         }
+//     };
+
+//     const onChangeSpy = jest.spyOn(testObject, 'onChange');
+
+//     const accordion = shallow(<NestedAccordion
+//         getItems={testObject.getItems}
+//         onChange={testObject.onChange}
+//         getItemContent={testObject.getItemContent} />);
+//     const accordionInstance = accordion.instance();
+
+//     const selectedIndicies = [];
+//     const item = {
+//         label: "Test Item 1"
+//     };
+//     const index = 0;
+//     const level = 0;
+
+//     accordionInstance.handleSecondClick(selectedIndicies, item, index, level);
+
+//     expect(onChangeSpy).toHaveBeenCalled();
+// });
+
+// it('cleans up old items correctly', () => {
+//     expect(false).toBeTruthy();
+// });
+
+// it('sets selected index correctly', () => {
+//     expect(false).toBeTruthy();
+// });
+
+// it('sets stored item correctly', () => {
+//     expect(false).toBeTruthy();
+// });
+
+// it('replaces old elements correctly', () => {
+//     expect(false).toBeTruthy();
+// });
+
+// it('cleans up array correct', () => {
+//     expect(false).toBeTruthy();
+// });
