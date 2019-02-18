@@ -505,11 +505,70 @@ it('sets selected index correctly', () => {
 
     expect(selectedIndicies).toHaveLength(2);
     expect(selectedIndicies[level]).toEqual(index);
+
+    index = 18
+    level = 0;
+
+    selectedIndicies = accordionInstance.setSelectedIndex(selectedIndicies, index, level);
+
+    expect(selectedIndicies).toHaveLength(1);
+    expect(selectedIndicies[level]).toEqual(index);
 });
 
-// it('sets stored item correctly', () => {
-//     expect(false).toBeTruthy();
-// });
+it('sets stored item correctly', () => {
+
+    const testObject = {
+        getItems(item, resolve, reject) {
+
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        },
+        onChange(item) {
+
+        }
+    };
+
+    const accordion = shallow(<NestedAccordion
+        getItems={testObject.getItems}
+        onChange={testObject.onChange}
+        getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
+
+    let storedItems = [];
+    let item = {
+        label: "Test 1"
+    };
+    let level = 0;
+
+    storedItems = accordionInstance.setStoredItem(storedItems, item, level);
+
+    expect(storedItems).toBeDefined();
+    expect(storedItems).toHaveLength(1);
+    expect(storedItems[level]).toEqual(item);
+
+    item = {
+        label: "Test 2"
+    }
+    level = 1;
+
+    storedItems = accordionInstance.setStoredItem(storedItems, item, level);
+
+    expect(storedItems).toHaveLength(2);
+    expect(storedItems[level]).toEqual(item);
+
+    item = {
+        label: "Test 3"
+    }
+    level = 0;
+
+    storedItems = accordionInstance.setStoredItem(storedItems, item, level);
+
+    expect(storedItems).toHaveLength(1);
+    expect(storedItems[level]).toEqual(item);
+});
 
 // it('replaces old elements correctly', () => {
 //     expect(false).toBeTruthy();
