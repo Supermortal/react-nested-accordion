@@ -321,7 +321,7 @@ it('handles second click correctly', () => {
     expect(hasSecondClick).toBeTruthy();
 });
 
-it('cleans up array correct', () => {
+it('cleans up array correctly', () => {
 
     const testItems = [
         { label: "Test1" },
@@ -466,9 +466,46 @@ it('cleans up old items correctly', () => {
     expect(replacementElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test3</p></div></li>");
 });
 
-// it('sets selected index correctly', () => {
-//     expect(false).toBeTruthy();
-// });
+it('sets selected index correctly', () => {
+
+    const testObject = {
+        getItems(item, resolve, reject) {
+
+        },
+        getItemContent(item) {
+            return (
+                <p>{item.label}</p>
+            );
+        },
+        onChange(item) {
+
+        }
+    };
+
+    const accordion = shallow(<NestedAccordion
+        getItems={testObject.getItems}
+        onChange={testObject.onChange}
+        getItemContent={testObject.getItemContent} />);
+    const accordionInstance = accordion.instance();
+
+    let selectedIndicies = [];
+    let index = 0;
+    let level = 0;
+
+    selectedIndicies = accordionInstance.setSelectedIndex(selectedIndicies, index, level);
+
+    expect(selectedIndicies).toBeDefined();
+    expect(selectedIndicies).toHaveLength(1);
+    expect(selectedIndicies[level]).toEqual(index);
+
+    index = 13;
+    level = 1;
+
+    selectedIndicies = accordionInstance.setSelectedIndex(selectedIndicies, index, level);
+
+    expect(selectedIndicies).toHaveLength(2);
+    expect(selectedIndicies[level]).toEqual(index);
+});
 
 // it('sets stored item correctly', () => {
 //     expect(false).toBeTruthy();

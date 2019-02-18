@@ -58,13 +58,17 @@ export default class NestedAccordion extends React.Component {
     }
 
     createItemElements(items, itemElements, contents, level) {
+
         for (let i = 0; i < items.length; i++) {
+
             const item = items[i];
             const content = this.props.getItemContent(item);
             const itemElement = this.createItemElement(item, i, level, content);
+
             itemElements[level][i] = itemElement;
             contents[level][i] = content;
         }
+
         return {
             itemElements,
             contents
@@ -72,9 +76,11 @@ export default class NestedAccordion extends React.Component {
     }
 
     createItemElement(item, index, level, content, childItemElements, isActive = false) {
+
         const accordionItemContentClasses = classNames("accordion-item-content", {
             active: isActive
         });
+
         const itemElement = (
             <li className="accordion-item" key={index}>
                 <div className={accordionItemContentClasses} onClick={this.onItemClick(item, index, level)}>
@@ -83,6 +89,7 @@ export default class NestedAccordion extends React.Component {
                 {(childItemElements) ? <ul className={(this.props.className) ? this.props.className : "nested-accordion"}>{childItemElements}</ul> : null}
             </li>
         );
+
         return itemElement;
     }
 
