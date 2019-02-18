@@ -206,26 +206,33 @@ export default class NestedAccordion extends React.Component {
     }
 
     replaceOldElements(selectedIndicies, storedItems, itemElements, contents) {
+
         for (let level = 0; level < selectedIndicies.length; level++) {
+
             const selectedIndex = selectedIndicies[level];
             const storedItem = storedItems[level];
             const selectedContent = contents[level][selectedIndex];
             const childItemElements = (itemElements[level + 1]) ? itemElements[level + 1] : null;
             const isActive = (level === selectedIndicies.length - 1) ? true : false;
             const replacementItemElement = this.createItemElement(storedItem, selectedIndex, level, selectedContent, childItemElements, isActive);
+
             itemElements[level][selectedIndex] = replacementItemElement;
         }
         return itemElements;
     }
 
     cleanUpOldItemElements(itemElements, contents, storedItems, selectedIndicies, level) {
+
         itemElements = this.cleanUpArray(itemElements, level);
         contents = this.cleanUpArray(contents, level);
+
         const selectedIndex = selectedIndicies[level];
         const storedItem = storedItems[level];
         const selectedContent = contents[level][selectedIndex];
         const replacementItemElement = this.createItemElement(storedItem, selectedIndex, level, selectedContent);
+
         itemElements[level][selectedIndex] = replacementItemElement;
+
         return {
             itemElements,
             contents
