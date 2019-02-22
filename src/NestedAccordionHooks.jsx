@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 
-export const prepElementArrays = (itemElements, contents, level) => {
-    itemElements[level] = [];
-    contents[level] = [];
-    return {
-        itemElements,
-        contents
-    };
-};
+import {
+    prepElementArrays,
+    checkForSecondClick,
+    cleanUpArray,
+    setSelectedIndex,
+    setStoredItem
+} from './NestedAccordionUtil';
 
 export const createItemElement = (stateObject, className, getItems, setChildren, item, index, level, content, childItemElements, isActive = false) => {
 
@@ -66,13 +65,6 @@ export const initialGetItemsProcessing = (className, items, stateObject, getItem
     return { itemElements, contents, selectedIndicies, storedItems };
 }
 
-export const isSecondClickFunc = (selectedIndicies, index, level) => {
-    const oldLevelIndex = selectedIndicies[level];
-    const isSecondClick = oldLevelIndex === index && level === (selectedIndicies.length - 1);
-
-    return isSecondClick;
-}
-
 export const handleSecondClick = (selectedIndicies, index, level, onChange) => {
 
     let hasSecondClick = false;
@@ -97,24 +89,6 @@ export const clearAll = (getItems, initialGetItemsProcessing, setChildren, state
             const updateObject = initialGetItemsProcessing(items, stateObject);
             setChildren(updateObject);
         });
-}
-
-export const setSelectedIndex = (selectedIndicies, index, level) => {
-    selectedIndicies[level] = index;
-    selectedIndicies = cleanUpArray(selectedIndicies, level);
-    return selectedIndicies;
-}
-
-export const setStoredItem = (storedItems, item, level) => {
-    storedItems[level] = item;
-    storedItems = cleanUpArray(storedItems, level);
-    return storedItems;
-}
-
-export const cleanUpArray = (array, level) => {
-    const levelPlus = level + 1;
-    array.splice(levelPlus, array.length - levelPlus);
-    return array;
 }
 
 export const replaceOldElements = (selectedIndicies, storedItems, itemElements, contents, createItemElement) => {
