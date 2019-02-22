@@ -193,7 +193,7 @@ import {
 //     };
 // }
 
-export const createItemElement = (getItemContent, item, index, className, childItemElements = null, isActive = false) => {
+export const createItemElement = (getItemContent, item, index, level, className, onItemClick, childItemElements = null, isActive = false) => {
 
     const content = getItemContent(item);
 
@@ -203,7 +203,9 @@ export const createItemElement = (getItemContent, item, index, className, childI
 
     const itemElement = (
         <li className="accordion-item" key={index}>
-            <div className={accordionItemContentClasses}
+            <div 
+                className={accordionItemContentClasses}
+                onClick={onItemClick(level, index)}
             >
                 {content}
             </div>
@@ -214,10 +216,22 @@ export const createItemElement = (getItemContent, item, index, className, childI
     return itemElement;
 };
 
+export const onItemClick = (level, index) => {
+    return e => {
+        console.log(`level: ${level}`);
+        console.log(`index: ${index}`);
+    };
+};
+
 export default function NestedAccordion(props) {
-    let [items, setItems] = useState(() => {
+
+    const [items, setItems] = useState(() => {
         const initialItems = prepElementArray([], 0);
         return initialItems;
+    });
+    const [selectedIndicies, setSelectedIndicies] = useState(() => {
+        const initialSelectedIndicies = prepElementArray([], 0);
+        return initialSelectedIndicies;
     });
 
     const getInitialItems = async () => {
@@ -225,16 +239,18 @@ export default function NestedAccordion(props) {
             props.getItems(null, resolve, reject);
         });
 
-        const items = await getInitialItemsPromise;
-        setItems(items);
+        const initialFetchedItems = await getInitialItemsPromise;
+        const returnItems = prepElementArray([], 0);
+        returnItems[0] = initialFetchedItems;
+        setItems(returnItems);
     };
 
     useEffect(() => {
         getInitialItems();
     }, []);
 
-    const constructedItemElements = items.map((item, index) => {
-        const itemElement = createItemElement(props.getItemContent, item, index, props.className);
+    const constructedItemElements = items[0].map((item, index) => {
+        const itemElement = createItemElement(props.getItemContent, item, index, 0, props.className, onItemClick);
         return itemElement;
     });
 
