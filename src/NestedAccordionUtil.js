@@ -1,10 +1,6 @@
-export const prepElementArrays = (itemElements, contents, level) => {
-    itemElements[level] = [];
-    contents[level] = [];
-    return {
-        itemElements,
-        contents
-    };
+export const prepElementArray = (array, level) => {
+    array[level] = [];
+    return array;
 };
 
 export const checkForSecondClick = (selectedIndicies, index, level) => {
