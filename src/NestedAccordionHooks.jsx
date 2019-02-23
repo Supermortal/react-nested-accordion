@@ -25,7 +25,7 @@ export const constructItemElements = (props, selectedIndicies, setSelectedIndici
         getLoadingComponent
     } = props;
 
-    let constructedItemElements = [];
+    let constructedItemElements = null;
     const selectedIndex = selectedIndicies[level];
 
     if (items[level + 1]) {
