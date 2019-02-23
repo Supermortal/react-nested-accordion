@@ -193,7 +193,7 @@ import {
 //     };
 // }
 
-export const createItemElement = (getItemContent, selectedIndicies, setSelectedIndicies, items, setItems, item, index, level, className, onItemClick, childItemElements = null, isActive = false) => {
+export const createItemElement = (getItemContent, item, index, className, onItemClickHandler, childItemElements = null, isActive = false) => {
 
     const content = getItemContent(item);
 
@@ -205,7 +205,7 @@ export const createItemElement = (getItemContent, selectedIndicies, setSelectedI
         <li className="accordion-item" key={index}>
             <div 
                 className={accordionItemContentClasses}
-                onClick={onItemClick(level, index, selectedIndicies, setSelectedIndicies, items, setItems)}
+                onClick={onItemClickHandler}
             >
                 {content}
             </div>
@@ -242,7 +242,8 @@ export const constructItemElements = (level, selectedIndicies, items, setItems, 
 
     constructedItemElements = items[level].map((item, index) => {
         const childItemElements = (index === selectedIndex) ? constructedItemElements : null;
-        const constructedItemElement = createItemElement(getItemContent, selectedIndicies, setSelectedIndicies, items, setItems, item, index, level, className, onItemClick, childItemElements);
+        const onItemClickHandler = onItemClick(level, index, selectedIndicies, setSelectedIndicies, items, setItems);
+        const constructedItemElement = createItemElement(getItemContent, item, index, className, onItemClickHandler, childItemElements);
         return constructedItemElement;
     });
 
