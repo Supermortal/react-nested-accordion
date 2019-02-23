@@ -1,263 +1,160 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
-export default class NestedAccordion extends React.Component {
+import PropTypes from 'prop-types';
 
-    constructor(props) {
-        super(props);
+export const checkForSecondClick = (selectedIndicies, index, level) => {
+    const oldLevelIndex = selectedIndicies[level];
+    const isSecondClick = oldLevelIndex === index && level === (selectedIndicies.length - 1);
 
-        this.createItemElements.bind(this);
-        this.clearAll.bind(this);
-        this.handleSecondClick.bind(this);
-        this.onItemClickPreprocess.bind(this);
-        this.onItemClickPostprocess.bind(this);
-        this.initialGetItemsProcessing.bind(this);
+    return isSecondClick;
+};
 
-        (new Promise((resolve, reject) => {
-            this.props.getItems(null, resolve, reject);
-        }))
-            .then(items => {
+export const cleanUpArray = (array, level) => {
+    const levelPlus = level + 1;
+    array.splice(levelPlus, array.length - levelPlus);
+    return array;
+};
 
-                const updateObject = this.initialGetItemsProcessing(items, this.state);
-                this.setState(updateObject);
-            });
+export const constructItemElements = (props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level) => {
 
-        this.state = {
-            itemElements: [],
-            contents: [],
-            selectedIndicies: [],
-            storedItems: []
-        };
+    const {
+        getItemContent, 
+        className, 
+        onChange, 
+        onSecondClick,
+        getLoadingComponent
+    } = props;
+
+    let constructedItemElements = null;
+    const selectedIndex = selectedIndicies[level];
+
+    if (items[level + 1]) {
+        constructedItemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level + 1);
     }
 
-    initialGetItemsProcessing(items, stateObject) {
+    constructedItemElements = items[level].map((item, index) => {
+        const isLoading = (index === loading.index && level === loading.level);
+        const isActive = (index === selectedIndex);
+        const childItemElements = (isActive) ? constructedItemElements : null;
+        const onItemClickHandler = onItemClick(onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
+        const constructedItemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+        return constructedItemElement;
+    });
 
-        const itemElementsArgument = stateObject.itemElements;
-        const contentsArgument = stateObject.contents;
-        const selectedIndicies = [];
-        const storedItems = [];
+    return constructedItemElements;
+};
 
-        const level = 0;
+export const createItemElement = (getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements = null, isActive = false, isLoading = false) => {
 
-        const updateObject = this.prepElementArrays(itemElementsArgument, contentsArgument, level);
-        const {
-            itemElements,
-            contents
-        } = this.createItemElements(items, updateObject.itemElements, updateObject.contents, level);
+    const content = getItemContent(item);
 
-        return { itemElements, contents, selectedIndicies, storedItems };
-    }
+    const accordionItemContentClasses = classNames("accordion-item-content", {
+        active: isActive
+    });
 
-    prepElementArrays(itemElements, contents, level) {
-        itemElements[level] = [];
-        contents[level] = [];
-        return {
-            itemElements,
-            contents
-        };
-    }
+    const itemElement = (
+        <li className="accordion-item" key={index}>
+            <div 
+                className={accordionItemContentClasses}
+                onClick={onItemClickHandler}
+            >
+                {content}
+            </div>
+            {(childItemElements) ? <ul className={(className) ? className : "nested-accordion"}>{childItemElements}</ul> : null}
+            {(isLoading && getLoadingComponent) ? getLoadingComponent() : null}
+        </li>
+    );
 
-    createItemElements(items, itemElements, contents, level) {
+    return itemElement;
+};
 
-        for (let i = 0; i < items.length; i++) {
+export const onItemClick = (onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index) => {
+    return e => {
 
-            const item = items[i];
-            const content = this.props.getItemContent(item);
-            const itemElement = this.createItemElement(item, i, level, content);
+        const item = items[level][index];
 
-            itemElements[level][i] = itemElement;
-            contents[level][i] = content;
+        const isSecondClick = checkForSecondClick(selectedIndicies, index, level);
+        if (isSecondClick) {
+            if (onSecondClick) {
+                onSecondClick(item);
+                return;
+            }
+
+            setItems([[]]);
+            setSelectedIndicies([null]);
+            return;
         }
 
-        return {
-            itemElements,
-            contents
-        };
-    }
+        selectedIndicies = cleanUpArray(selectedIndicies, level);
+        const newSelectedIndicies = [...selectedIndicies];
+        newSelectedIndicies[level] = index;
+        setSelectedIndicies(newSelectedIndicies);
 
-    createItemElement(item, index, level, content, childItemElements, isActive = false) {
+        items = cleanUpArray(items, level);
+        const newItems = [...items];
+        setItems(newItems);
 
-        const accordionItemContentClasses = classNames("accordion-item-content", {
-            active: isActive
+        if (onChange) onChange(item);
+    };
+};
+
+export default function NestedAccordion(props) {
+
+    const { 
+        className,
+        getItems,
+        getLoadingComponent
+    } = props;
+
+    const [items, setItems] = useState([[]]);
+    const [selectedIndicies, setSelectedIndicies] = useState([null]);
+    const [loading, setLoading] = useState({ index: null, level: null });
+
+    const getItemsCall = async (item, level) => {
+        const getItemsPromise = new Promise((resolve, reject) => {
+            getItems(item, resolve, reject);
         });
 
-        const itemElement = (
-            <li className="accordion-item" key={index}>
-                <div className={accordionItemContentClasses} onClick={this.onItemClick(item, index, level)}>
-                    {content}
-                </div>
-                {(childItemElements) ? <ul className={(this.props.className) ? this.props.className : "nested-accordion"}>{childItemElements}</ul> : null}
-            </li>
-        );
-
-        return itemElement;
-    }
-
-    onItemClick(item, index, level) {
-        return (e) => {
-
-            let updateObject = this.onItemClickPreprocess(item, index, level, this.state);
-            if (!updateObject) return;
-
-            this.setState(updateObject);
-
-            (new Promise((resolve, reject) => {
-                this.props.getItems(item, resolve, reject);
-            }))
-                .then((items) => {
-                    if (!items) return;
-
-                    updateObject = this.onItemClickPostprocess(level, items, updateObject);
-                    this.setState(updateObject);
-                });
-        };
-    }
-
-    onItemClickPreprocess(item, index, level, stateObject) {
-
-        const argumentSelectedIndicies = stateObject.selectedIndicies;
-        const argumentItemElements = stateObject.itemElements;
-        const argumentContents = stateObject.contents;
-        const argumentStoredItems = stateObject.storedItems;
-
-        const hasSecondClick = this.handleSecondClick(argumentSelectedIndicies, index, level);
-        if (hasSecondClick) return null;
-
-        if (this.props.onChange) this.props.onChange(item);
-
-        const {
-            itemElements,
-            contents
-        } = this.cleanUpOldItemElements(argumentItemElements,
-            argumentContents, argumentStoredItems, argumentSelectedIndicies, level);
-
-        const selectedIndicies = this.setSelectedIndex(argumentSelectedIndicies, index, level);
-        const storedItems = this.setStoredItem(argumentStoredItems, item, level);
-
-        return { itemElements, contents, selectedIndicies, storedItems };
-    }
-
-    onItemClickPostprocess(level, items, stateObject) {
-
-        const itemElementsArgument = stateObject.itemElements;
-        const contentsArgument = stateObject.contents;
-        const selectedIndicies = stateObject.selectedIndicies;
-        const storedItems = stateObject.storedItems;
-
-        const newLevel = level + 1;
-
-        let updateObject = this.prepElementArrays(itemElementsArgument, contentsArgument, newLevel);
-        updateObject = this.createItemElements(items, updateObject.itemElements, updateObject.contents, newLevel);
-        let itemElements = updateObject.itemElements;
-        const contents = updateObject.contents;
-
-        itemElements = this.replaceOldElements(selectedIndicies, storedItems, itemElements, contents);
-
-        return {
-            itemElements,
-            contents,
-            selectedIndicies,
-            storedItems
-        };
-    }
-
-    handleSecondClick(selectedIndicies, index, level) {
-
-        let hasSecondClick = false;
-
-        const isSecondClick = this.isSecondClick(selectedIndicies, index, level);
-
-        if (isSecondClick) {
-            this.clearAll();
-            if (this.props.onChange) this.props.onChange(null);
-            hasSecondClick = true;
+        let newItems = [...items];
+        
+        const fetchedItems = await getItemsPromise;
+        if (fetchedItems) {
+            newItems[level] = fetchedItems;
+        }
+        else {
+            newItems = cleanUpArray(newItems, level);
         }
 
-        return hasSecondClick;
-    }
+        setLoading({ index: null, level: null });
+        setItems(newItems);
+    };
 
-    isSecondClick(selectedIndicies, index, level) {
-        const oldLevelIndex = selectedIndicies[level];
-        const isSecondClick = oldLevelIndex === index && level === (selectedIndicies.length - 1);
+    useEffect(() => {
+        const currentLevel = selectedIndicies.length - 1;
+        const currentSelectedIndex = selectedIndicies[currentLevel];
+        const currentItem = items[currentLevel][currentSelectedIndex];
 
-        return isSecondClick;
-    }
+        const getLevel = (selectedIndicies[0] === null) ? 0 : currentLevel + 1;
 
-    clearAll() {
-        (new Promise((resolve, reject) => {
-            this.props.getItems(null, resolve, reject);
-        }))
-            .then(items => {
+        setLoading({ index: currentSelectedIndex, level: currentLevel });
+        getItemsCall(currentItem, getLevel);
+    }, [selectedIndicies]);
 
-                const updateObject = this.initialGetItemsProcessing(items, this.state);
-                this.setState(updateObject);
-            });
-    }
+    const constructedItemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, 0);
 
-    setSelectedIndex(selectedIndicies, index, level) {
-        selectedIndicies[level] = index;
-        selectedIndicies = this.cleanUpArray(selectedIndicies, level);
-        return selectedIndicies;
-    }
-
-    setStoredItem(storedItems, item, level) {
-        storedItems[level] = item;
-        storedItems = this.cleanUpArray(storedItems, level);
-        return storedItems;
-    }
-
-    cleanUpArray(array, level) {
-        const levelPlus = level + 1;
-        array.splice(levelPlus, array.length - levelPlus);
-        return array;
-    }
-
-    replaceOldElements(selectedIndicies, storedItems, itemElements, contents) {
-
-        for (let level = 0; level < selectedIndicies.length; level++) {
-
-            const selectedIndex = selectedIndicies[level];
-            const storedItem = storedItems[level];
-            const selectedContent = contents[level][selectedIndex];
-            const childItemElements = (itemElements[level + 1]) ? itemElements[level + 1] : null;
-            const isActive = (level === selectedIndicies.length - 1) ? true : false;
-            const replacementItemElement = this.createItemElement(storedItem, selectedIndex, level, selectedContent, childItemElements, isActive);
-
-            itemElements[level][selectedIndex] = replacementItemElement;
-        }
-        return itemElements;
-    }
-
-    cleanUpOldItemElements(itemElements, contents, storedItems, selectedIndicies, level) {
-
-        itemElements = this.cleanUpArray(itemElements, level);
-        contents = this.cleanUpArray(contents, level);
-
-        const selectedIndex = selectedIndicies[level];
-        const storedItem = storedItems[level];
-        const selectedContent = contents[level][selectedIndex];
-        const replacementItemElement = this.createItemElement(storedItem, selectedIndex, level, selectedContent);
-
-        itemElements[level][selectedIndex] = replacementItemElement;
-
-        return {
-            itemElements,
-            contents
-        };
-    }
-
-    render() {
-        return (
-            <ul className={(this.props.className) ? this.props.className : "nested-accordion"}>
-                {this.state.itemElements[0]}
-            </ul>
-        );
-    }
-}
+    return (
+        <ul className={(className) ? className : "nested-accordion"}>
+            {(loading.index === null && loading.level === 0 && getLoadingComponent) ? getLoadingComponent() : null}
+            {constructedItemElements}
+        </ul>
+    );
+};
 
 NestedAccordion.propTypes = {
     getItems: PropTypes.func.isRequired,
     getItemContent: PropTypes.func.isRequired,
     className: PropTypes.string,
-    onChange: PropTypes.func
-}
+    onChange: PropTypes.func,
+    onSecondClick: PropTypes.func,
+    getLoadingComponent: PropTypes.func
+};

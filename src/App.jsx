@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import NestedAccordion from './NestedAccordionHooks';
+import NestedAccordion from './NestedAccordion';
 import { testData } from './testData';
 
 class App extends Component {
