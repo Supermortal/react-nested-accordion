@@ -1,4 +1,4 @@
-export const prepElementArray = (array, level) => {
+export const prepItemArray = (array, level) => {
     array[level] = [];
     return array;
 };
