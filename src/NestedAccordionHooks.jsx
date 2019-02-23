@@ -233,10 +233,7 @@ export default function NestedAccordion(props) {
         const initialItems = prepElementArray([], 0);
         return initialItems;
     });
-    const [selectedIndicies, setSelectedIndicies] = useState(() => {
-        const initialSelectedIndicies = prepElementArray([], 0);
-        return initialSelectedIndicies;
-    });
+    const [selectedIndicies, setSelectedIndicies] = useState([null]);
 
     const getItems = async (item, level) => {
         const getItemsPromise = new Promise((resolve, reject) => {
@@ -261,7 +258,7 @@ export default function NestedAccordion(props) {
         const currentSelectedIndex = selectedIndicies[currentLevel];
         const currentItem = items[currentLevel][currentSelectedIndex];
 
-        const getLevel = (selectedIndicies[0].length === 0) ? 0 : currentLevel + 1;
+        const getLevel = (selectedIndicies[0] === null) ? 0 : currentLevel + 1;
 
         getItems(currentItem, getLevel);
     }, [selectedIndicies]);
