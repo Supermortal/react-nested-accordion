@@ -216,7 +216,7 @@ export const createItemElement = (getItemContent, item, index, className, onItem
     return itemElement;
 };
 
-export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies, items, setItems) => {
+export const onItemClick = (onChange, selectedIndicies, setSelectedIndicies, items, setItems, level, index) => {
     return e => {
         selectedIndicies = cleanUpArray(selectedIndicies, level);
 
@@ -228,21 +228,24 @@ export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies,
         items = cleanUpArray(items, level);
         const newItems = [...items];
         setItems(newItems);
+
+        const item = items[level][index];
+        if (onChange) onChange(item);
     };
 };
 
-export const constructItemElements = (getItemContent, className, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
+export const constructItemElements = (getItemContent, className, onChange, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
 
     let constructedItemElements = [];
     const selectedIndex = selectedIndicies[level];
 
     if (items[level + 1]) {
-        constructedItemElements = constructItemElements(getItemContent, className, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
+        constructedItemElements = constructItemElements(getItemContent, className, onChange, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
     }
 
     constructedItemElements = items[level].map((item, index) => {
         const childItemElements = (index === selectedIndex) ? constructedItemElements : null;
-        const onItemClickHandler = onItemClick(level, index, selectedIndicies, setSelectedIndicies, items, setItems);
+        const onItemClickHandler = onItemClick(onChange, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
         const constructedItemElement = createItemElement(getItemContent, item, index, className, onItemClickHandler, childItemElements);
         return constructedItemElement;
     });
@@ -293,7 +296,7 @@ export default function NestedAccordion(props) {
         getItemsCall(currentItem, getLevel);
     }, [selectedIndicies]);
 
-    const constructedItemElements = constructItemElements(getItemContent, className, selectedIndicies, setSelectedIndicies, items, setItems, 0);
+    const constructedItemElements = constructItemElements(getItemContent, className, onChange, selectedIndicies, setSelectedIndicies, items, setItems, 0);
 
     return (
         <ul className={(className) ? className : "nested-accordion"}>
