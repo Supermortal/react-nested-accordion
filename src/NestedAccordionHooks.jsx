@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-// import {
-//     checkForSecondClick,
-//     cleanUpArray
-// } from './NestedAccordionUtil';
+export const checkForSecondClick = (selectedIndicies, index, level) => {
+    const oldLevelIndex = selectedIndicies[level];
+    const isSecondClick = oldLevelIndex === index && level === (selectedIndicies.length - 1);
+
+    return isSecondClick;
+};
 
 export const cleanUpArray = (array, level) => {
     const levelPlus = level + 1;
@@ -36,8 +38,22 @@ export const createItemElement = (getItemContent, item, index, className, onItem
     return itemElement;
 };
 
-export const onItemClick = (onChange, selectedIndicies, setSelectedIndicies, items, setItems, level, index) => {
+export const onItemClick = (onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index) => {
     return e => {
+
+        const item = items[level][index];
+
+        const isSecondClick = checkForSecondClick(selectedIndicies, index, level);
+        if (isSecondClick) {
+            if (onSecondClick) {
+                onSecondClick(item);
+                return;
+            }
+
+            setItems([[]]);
+            setSelectedIndicies([null]);
+            return;
+        }
 
         selectedIndicies = cleanUpArray(selectedIndicies, level);
         const newSelectedIndicies = [...selectedIndicies];
@@ -48,23 +64,22 @@ export const onItemClick = (onChange, selectedIndicies, setSelectedIndicies, ite
         const newItems = [...items];
         setItems(newItems);
 
-        const item = items[level][index];
         if (onChange) onChange(item);
     };
 };
 
-export const constructItemElements = (getItemContent, className, onChange, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
+export const constructItemElements = (getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
 
     let constructedItemElements = [];
     const selectedIndex = selectedIndicies[level];
 
     if (items[level + 1]) {
-        constructedItemElements = constructItemElements(getItemContent, className, onChange, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
+        constructedItemElements = constructItemElements(getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
     }
 
     constructedItemElements = items[level].map((item, index) => {
         const childItemElements = (index === selectedIndex) ? constructedItemElements : null;
-        const onItemClickHandler = onItemClick(onChange, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
+        const onItemClickHandler = onItemClick(onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
         const constructedItemElement = createItemElement(getItemContent, item, index, className, onItemClickHandler, childItemElements);
         return constructedItemElement;
     });
@@ -78,7 +93,9 @@ export default function NestedAccordion(props) {
         getItemContent, 
         className,
         getItems,
-        onChange
+        onChange,
+        onSecondClick,
+        getLoadingComponent
     } = props;
 
     const [items, setItems] = useState([[]]);
@@ -112,7 +129,7 @@ export default function NestedAccordion(props) {
         getItemsCall(currentItem, getLevel);
     }, [selectedIndicies]);
 
-    const constructedItemElements = constructItemElements(getItemContent, className, onChange, selectedIndicies, setSelectedIndicies, items, setItems, 0);
+    const constructedItemElements = constructItemElements(getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, 0);
 
     return (
         <ul className={(className) ? className : "nested-accordion"}>
