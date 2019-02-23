@@ -193,7 +193,7 @@ import {
 //     };
 // }
 
-export const createItemElement = (getItemContent, item, index, level, className, onItemClick, childItemElements = null, isActive = false) => {
+export const createItemElement = (getItemContent, selectedIndicies, setSelectedIndicies, item, index, level, className, onItemClick, childItemElements = null, isActive = false) => {
 
     const content = getItemContent(item);
 
@@ -205,7 +205,7 @@ export const createItemElement = (getItemContent, item, index, level, className,
         <li className="accordion-item" key={index}>
             <div 
                 className={accordionItemContentClasses}
-                onClick={onItemClick(level, index)}
+                onClick={onItemClick(level, index, selectedIndicies, setSelectedIndicies)}
             >
                 {content}
             </div>
@@ -216,10 +216,14 @@ export const createItemElement = (getItemContent, item, index, level, className,
     return itemElement;
 };
 
-export const onItemClick = (level, index) => {
+export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies) => {
     return e => {
-        console.log(`level: ${level}`);
-        console.log(`index: ${index}`);
+        selectedIndicies = cleanUpArray(selectedIndicies, level);
+
+        const newSelectedIndicies = [...selectedIndicies];
+        newSelectedIndicies[level] = index;
+        
+        setSelectedIndicies(newSelectedIndicies);
     };
 };
 
@@ -234,23 +238,59 @@ export default function NestedAccordion(props) {
         return initialSelectedIndicies;
     });
 
-    const getInitialItems = async () => {
-        const getInitialItemsPromise = new Promise((resolve, reject) => {
-            props.getItems(null, resolve, reject);
+    const getItems = async (item, level) => {
+        const getItemsPromise = new Promise((resolve, reject) => {
+            props.getItems(item, resolve, reject);
         });
 
-        const initialFetchedItems = await getInitialItemsPromise;
-        const returnItems = prepElementArray([], 0);
-        returnItems[0] = initialFetchedItems;
-        setItems(returnItems);
+        let newItems = [...items];
+        
+        const fetchedItems = await getItemsPromise;
+        if (fetchedItems) {
+            newItems[level] = fetchedItems;
+        }
+        else {
+            newItems.splice(level, 1);
+        }
+
+        setItems(newItems);
     };
 
     useEffect(() => {
-        getInitialItems();
-    }, []);
+        const currentLevel = selectedIndicies.length - 1;
+        const currentSelectedIndex = selectedIndicies[currentLevel];
+        const currentItem = items[currentLevel][currentSelectedIndex];
+
+        const getLevel = (selectedIndicies[0].length === 0) ? 0 : currentLevel + 1;
+
+        getItems(currentItem, getLevel);
+    }, [selectedIndicies]);
+
+    for (let i=0; i < items.length; i++) {
+
+        const selectedIndex = selectedIndicies[i];
+
+        const constructedItemElements = items[i].map((item, index) => {
+
+            let childItemElements = null;
+            let isActive = false;
+            if (index === selectedIndex && items[i + 1]) {
+
+                isActive = true;
+
+                childItemElements = items[i + 1].map((value, index) => {
+                    const itemElement = createItemElement(props.getItemContent, selectedIndicies, setSelectedIndicies, item, index, 0, props.className, onItemClick);
+                    return itemElement;
+                });
+            }
+
+            const itemElement = createItemElement(props.getItemContent, selectedIndicies, setSelectedIndicies, item, index, 0, props.className, onItemClick, childItemElements, isActive);
+            return itemElement;
+        });
+    }
 
     const constructedItemElements = items[0].map((item, index) => {
-        const itemElement = createItemElement(props.getItemContent, item, index, 0, props.className, onItemClick);
+        const itemElement = createItemElement(props.getItemContent, selectedIndicies, setSelectedIndicies, item, index, 0, props.className, onItemClick);
         return itemElement;
     });
 
