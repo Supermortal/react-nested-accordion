@@ -15,6 +15,26 @@ export const cleanUpArray = (array, level) => {
     return array;
 };
 
+export const constructItemElements = (getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
+
+    let constructedItemElements = [];
+    const selectedIndex = selectedIndicies[level];
+
+    if (items[level + 1]) {
+        constructedItemElements = constructItemElements(getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
+    }
+
+    constructedItemElements = items[level].map((item, index) => {
+        const isActive = (index === selectedIndex);
+        const childItemElements = (isActive) ? constructedItemElements : null;
+        const onItemClickHandler = onItemClick(onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
+        const constructedItemElement = createItemElement(getItemContent, item, index, className, onItemClickHandler, childItemElements, isActive);
+        return constructedItemElement;
+    });
+
+    return constructedItemElements;
+};
+
 export const createItemElement = (getItemContent, item, index, className, onItemClickHandler, childItemElements = null, isActive = false) => {
 
     const content = getItemContent(item);
@@ -66,25 +86,6 @@ export const onItemClick = (onChange, onSecondClick, selectedIndicies, setSelect
 
         if (onChange) onChange(item);
     };
-};
-
-export const constructItemElements = (getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
-
-    let constructedItemElements = [];
-    const selectedIndex = selectedIndicies[level];
-
-    if (items[level + 1]) {
-        constructedItemElements = constructItemElements(getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
-    }
-
-    constructedItemElements = items[level].map((item, index) => {
-        const childItemElements = (index === selectedIndex) ? constructedItemElements : null;
-        const onItemClickHandler = onItemClick(onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
-        const constructedItemElement = createItemElement(getItemContent, item, index, className, onItemClickHandler, childItemElements);
-        return constructedItemElement;
-    });
-
-    return constructedItemElements;
 };
 
 export default function NestedAccordion(props) {
