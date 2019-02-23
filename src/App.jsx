@@ -8,12 +8,14 @@ import { testData } from './testData';
 class App extends Component {
 
   getItems(item, resolve, reject) {
-    if (!item) {
-      resolve(testData.get("root"));
-      return;
-    }
-
-    resolve(testData.get(item.label));
+    setTimeout(() => {
+      if (!item) {
+        resolve(testData.get("root"));
+        return;
+      }
+  
+      resolve(testData.get(item.label));
+    }, 500);
   }
 
   getItemContent(item) {
@@ -34,6 +36,9 @@ class App extends Component {
         <NestedAccordion
           getItems={this.getItems}
           onChange={this.onChange()}
+          getLoadingComponent={
+            () => (<div>Loading...</div>)
+          }
           getItemContent={this.getItemContent} />
       </div>
     );

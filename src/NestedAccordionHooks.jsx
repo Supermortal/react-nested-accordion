@@ -15,27 +15,36 @@ export const cleanUpArray = (array, level) => {
     return array;
 };
 
-export const constructItemElements = (getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
+export const constructItemElements = (props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level) => {
+
+    const {
+        getItemContent, 
+        className, 
+        onChange, 
+        onSecondClick,
+        getLoadingComponent
+    } = props;
 
     let constructedItemElements = [];
     const selectedIndex = selectedIndicies[level];
 
     if (items[level + 1]) {
-        constructedItemElements = constructItemElements(getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
+        constructedItemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level + 1);
     }
 
     constructedItemElements = items[level].map((item, index) => {
+        const isLoading = (index === loading.index && level === loading.level);
         const isActive = (index === selectedIndex);
         const childItemElements = (isActive) ? constructedItemElements : null;
         const onItemClickHandler = onItemClick(onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, level, index);
-        const constructedItemElement = createItemElement(getItemContent, item, index, className, onItemClickHandler, childItemElements, isActive);
+        const constructedItemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
         return constructedItemElement;
     });
 
     return constructedItemElements;
 };
 
-export const createItemElement = (getItemContent, item, index, className, onItemClickHandler, childItemElements = null, isActive = false) => {
+export const createItemElement = (getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements = null, isActive = false, isLoading = false) => {
 
     const content = getItemContent(item);
 
@@ -52,6 +61,7 @@ export const createItemElement = (getItemContent, item, index, className, onItem
                 {content}
             </div>
             {(childItemElements) ? <ul className={(className) ? className : "nested-accordion"}>{childItemElements}</ul> : null}
+            {(isLoading && getLoadingComponent) ? getLoadingComponent() : null}
         </li>
     );
 
@@ -91,16 +101,14 @@ export const onItemClick = (onChange, onSecondClick, selectedIndicies, setSelect
 export default function NestedAccordion(props) {
 
     const { 
-        getItemContent, 
         className,
         getItems,
-        onChange,
-        onSecondClick,
         getLoadingComponent
     } = props;
 
     const [items, setItems] = useState([[]]);
     const [selectedIndicies, setSelectedIndicies] = useState([null]);
+    const [loading, setLoading] = useState({ index: null, level: null });
 
     const getItemsCall = async (item, level) => {
         const getItemsPromise = new Promise((resolve, reject) => {
@@ -117,6 +125,7 @@ export default function NestedAccordion(props) {
             newItems = cleanUpArray(newItems, level);
         }
 
+        setLoading({ index: null, level: null });
         setItems(newItems);
     };
 
@@ -127,13 +136,15 @@ export default function NestedAccordion(props) {
 
         const getLevel = (selectedIndicies[0] === null) ? 0 : currentLevel + 1;
 
+        setLoading({ index: currentSelectedIndex, level: currentLevel });
         getItemsCall(currentItem, getLevel);
     }, [selectedIndicies]);
 
-    const constructedItemElements = constructItemElements(getItemContent, className, onChange, onSecondClick, selectedIndicies, setSelectedIndicies, items, setItems, 0);
+    const constructedItemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, 0);
 
     return (
         <ul className={(className) ? className : "nested-accordion"}>
+            {(loading.index === null && loading.level === 0 && getLoadingComponent) ? getLoadingComponent() : null}
             {constructedItemElements}
         </ul>
     );
@@ -143,5 +154,7 @@ NestedAccordion.propTypes = {
     getItems: PropTypes.func.isRequired,
     getItemContent: PropTypes.func.isRequired,
     className: PropTypes.string,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    onSecondClick: PropTypes.func,
+    getLoadingComponent: PropTypes.func
 };
