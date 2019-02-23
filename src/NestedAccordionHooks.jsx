@@ -231,13 +231,13 @@ export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies,
     };
 };
 
-export const constructItemElements = (level, selectedIndicies, items, setItems, getItemContent, setSelectedIndicies, className, onItemClick) => {
+export const constructItemElements = (getItemContent, className, selectedIndicies, setSelectedIndicies, items, setItems, level) => {
 
     let constructedItemElements = [];
     const selectedIndex = selectedIndicies[level];
 
     if (items[level + 1]) {
-        constructedItemElements = constructItemElements(level + 1, selectedIndicies, items, setItems, getItemContent, selectedIndicies, className, onItemClick);
+        constructedItemElements = constructItemElements(getItemContent, className, selectedIndicies, setSelectedIndicies, items, setItems, level + 1);
     }
 
     constructedItemElements = items[level].map((item, index) => {
@@ -252,15 +252,22 @@ export const constructItemElements = (level, selectedIndicies, items, setItems, 
 
 export default function NestedAccordion(props) {
 
+    const { 
+        getItemContent, 
+        className,
+        getItems,
+        onChange
+    } = props;
+
     const [items, setItems] = useState(() => {
         const initialItems = prepElementArray([], 0);
         return initialItems;
     });
     const [selectedIndicies, setSelectedIndicies] = useState([null]);
 
-    const getItems = async (item, level) => {
+    const getItemsCall = async (item, level) => {
         const getItemsPromise = new Promise((resolve, reject) => {
-            props.getItems(item, resolve, reject);
+            getItems(item, resolve, reject);
         });
 
         let newItems = [...items];
@@ -283,13 +290,13 @@ export default function NestedAccordion(props) {
 
         const getLevel = (selectedIndicies[0] === null) ? 0 : currentLevel + 1;
 
-        getItems(currentItem, getLevel);
+        getItemsCall(currentItem, getLevel);
     }, [selectedIndicies]);
 
-    const constructedItemElements = constructItemElements(0, selectedIndicies, items, setItems, props.getItemContent, setSelectedIndicies, props.className, onItemClick);
+    const constructedItemElements = constructItemElements(getItemContent, className, selectedIndicies, setSelectedIndicies, items, setItems, 0);
 
     return (
-        <ul className={(props.className) ? props.className : "nested-accordion"}>
+        <ul className={(className) ? className : "nested-accordion"}>
             {constructedItemElements}
         </ul>
     );
