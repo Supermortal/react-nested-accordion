@@ -193,7 +193,7 @@ import {
 //     };
 // }
 
-export const createItemElement = (getItemContent, selectedIndicies, setSelectedIndicies, item, index, level, className, onItemClick, childItemElements = null, isActive = false) => {
+export const createItemElement = (getItemContent, selectedIndicies, setSelectedIndicies, items, setItems, item, index, level, className, onItemClick, childItemElements = null, isActive = false) => {
 
     const content = getItemContent(item);
 
@@ -205,7 +205,7 @@ export const createItemElement = (getItemContent, selectedIndicies, setSelectedI
         <li className="accordion-item" key={index}>
             <div 
                 className={accordionItemContentClasses}
-                onClick={onItemClick(level, index, selectedIndicies, setSelectedIndicies)}
+                onClick={onItemClick(level, index, selectedIndicies, setSelectedIndicies, items, setItems)}
             >
                 {content}
             </div>
@@ -216,7 +216,7 @@ export const createItemElement = (getItemContent, selectedIndicies, setSelectedI
     return itemElement;
 };
 
-export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies) => {
+export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies, items, setItems) => {
     return e => {
         selectedIndicies = cleanUpArray(selectedIndicies, level);
 
@@ -224,21 +224,25 @@ export const onItemClick = (level, index, selectedIndicies, setSelectedIndicies)
         newSelectedIndicies[level] = index;
         
         setSelectedIndicies(newSelectedIndicies);
+
+        items = cleanUpArray(items, level);
+        const newItems = [...items];
+        setItems(newItems);
     };
 };
 
-export const constructItemElements = (level, selectedIndicies, items, getItemContent, setSelectedIndicies, className, onItemClick) => {
+export const constructItemElements = (level, selectedIndicies, items, setItems, getItemContent, setSelectedIndicies, className, onItemClick) => {
 
     let constructedItemElements = [];
     const selectedIndex = selectedIndicies[level];
 
     if (items[level + 1]) {
-        constructedItemElements = constructItemElements(level + 1, selectedIndicies, items, getItemContent, selectedIndicies, className, onItemClick);
+        constructedItemElements = constructItemElements(level + 1, selectedIndicies, items, setItems, getItemContent, selectedIndicies, className, onItemClick);
     }
 
     constructedItemElements = items[level].map((item, index) => {
         const childItemElements = (index === selectedIndex) ? constructedItemElements : null;
-        const constructedItemElement = createItemElement(getItemContent, selectedIndicies, setSelectedIndicies, item, index, level, className, onItemClick, childItemElements);
+        const constructedItemElement = createItemElement(getItemContent, selectedIndicies, setSelectedIndicies, items, setItems, item, index, level, className, onItemClick, childItemElements);
         return constructedItemElement;
     });
 
@@ -265,7 +269,7 @@ export default function NestedAccordion(props) {
             newItems[level] = fetchedItems;
         }
         else {
-            newItems.splice(level, 1);
+            newItems = cleanUpArray(newItems, level);
         }
 
         setItems(newItems);
@@ -281,12 +285,7 @@ export default function NestedAccordion(props) {
         getItems(currentItem, getLevel);
     }, [selectedIndicies]);
 
-    let constructedItemElements = constructItemElements(0, selectedIndicies, items, props.getItemContent, setSelectedIndicies, props.className, onItemClick);
-
-    // constructedItemElements = items[0].map((item, index) => {
-    //     const itemElement = createItemElement(props.getItemContent, selectedIndicies, setSelectedIndicies, item, index, 0, props.className, onItemClick);
-    //     return itemElement;
-    // });
+    const constructedItemElements = constructItemElements(0, selectedIndicies, items, setItems, props.getItemContent, setSelectedIndicies, props.className, onItemClick);
 
     return (
         <ul className={(props.className) ? props.className : "nested-accordion"}>
