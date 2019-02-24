@@ -4,7 +4,13 @@ import ReactDOM from 'react-dom';
 import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import NestedAccordion from './NestedAccordion';
+import NestedAccordion, { 
+    checkForSecondClick,
+    cleanUpArray,
+    constructItemElements,
+    createItemElement,
+    onItemClick
+} from './NestedAccordion';
 import { testData } from './testData';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -53,4 +59,21 @@ it('calls get items on render', () => {
     expect(spy).toHaveBeenCalled();
 
     spy.mockRestore();
+});
+
+it('checks for second click correctly', () => {
+
+    let selectedIndicies = [0, 1];
+    let index = 1;
+    let level = 1;
+
+    let isSecondClick = checkForSecondClick(selectedIndicies, index, level);
+
+    expect(isSecondClick).toBeTruthy();
+
+    index = 2;
+
+    isSecondClick = checkForSecondClick(selectedIndicies, index, level);
+
+    expect(isSecondClick).toBeFalsy();
 });
