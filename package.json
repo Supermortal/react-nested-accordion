@@ -1,16 +1,7 @@
 {
   "name": "react-nested-accordion",
   "version": "0.1.0",
-  "description": "A dynamic nested accordion component for React",
-  "main": "index.js",
-  "keywords": [
-    "react",
-    "nested",
-    "accordion",
-    "dynamic"
-  ],
-  "author": "Christopher Pink",
-  "license": "MIT",
+  "private": true,
   "dependencies": {
     "@babel/core": "7.2.2",
     "@svgr/webpack": "4.1.0",
@@ -26,7 +17,7 @@
     "css-loader": "1.0.0",
     "dotenv": "6.0.0",
     "dotenv-expand": "4.2.0",
-    "enzyme": "^3.8.0",
+    "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.9.1",
     "eslint": "5.12.0",
     "eslint-config-react-app": "^3.0.7",
@@ -52,10 +43,10 @@
     "postcss-preset-env": "6.5.0",
     "postcss-safe-parser": "4.0.1",
     "prop-types": "^15.7.2",
-    "react": "^16.8.2",
+    "react": "^16.8.3",
     "react-app-polyfill": "^0.2.1",
     "react-dev-utils": "^7.0.3",
-    "react-dom": "^16.8.2",
+    "react-dom": "^16.8.3",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
     "style-loader": "0.23.1",
@@ -121,8 +112,8 @@
       "node"
     ],
     "watchPlugins": [
-      "<rootDir>\\node_modules\\jest-watch-typeahead\\filename.js",
-      "<rootDir>\\node_modules\\jest-watch-typeahead\\testname.js"
+      "X:\\GitHub\\react-nested-accordion\\node_modules\\jest-watch-typeahead\\filename.js",
+      "X:\\GitHub\\react-nested-accordion\\node_modules\\jest-watch-typeahead\\testname.js"
     ]
   },
   "babel": {
