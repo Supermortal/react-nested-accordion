@@ -123,3 +123,66 @@ it('cleans up array correctly', () => {
 
     expect(array.length).toEqual(2);
 });
+
+it('creates item element correctly', () => {
+
+    let getItemContent = (item) => {
+        return (<div>{item.label}</div>);
+    };
+    let getLoadingComponent = undefined;
+    let item = {
+        label: "test-item"
+    };
+    let index = 0;
+    let className = "test-class";
+    let onItemClickHandler = () => {
+
+    };
+    let childItemElements = undefined;
+    let isActive = false;
+    let isLoading = false;
+
+    let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    let itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div></li>");
+
+    item = {
+        label: "test-item-2"
+    }
+    childItemElements = [
+        itemElement
+    ];
+
+    itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item-2</div></div><ul class=\"test-class\"><li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div></li></ul></li>");
+});
+
+it('constructs item elements correctly', () => {
+
+        let getItemContent = (item) => {
+
+        };
+        let className = "test-class";
+        let onChange = (item) => {
+
+        };
+        let onSecondClick = (item) => {
+
+        };
+        let getLoadingComponent = undefined;
+        let props = {
+            getItemContent,
+            className,
+            onChange,
+            onSecondClick,
+            getLoadingComponent
+        };
+
+        let selectedIndicies = [];
+
+});
