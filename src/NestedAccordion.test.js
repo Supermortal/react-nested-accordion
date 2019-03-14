@@ -11,7 +11,7 @@ import NestedAccordion, {
     createItemElement,
     onItemClick
 } from './NestedAccordion';
-import { testData } from './testData';
+import { testDataArray } from './testData';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -279,17 +279,11 @@ it('constructs nested item elements correctly', () => {
         onSecondClick,
         getLoadingComponent
     };
-    let selectedIndicies = [];
+    let selectedIndicies = [0];
     let setSelectedIndicies = (selectedIndicies) => {
 
     };
-    let items = [
-        [
-            {
-                label: "test-item"
-            }
-        ]
-    ];
+    let items = testDataArray;
     let setItems = (items) => {
 
     };
@@ -297,7 +291,11 @@ it('constructs nested item elements correctly', () => {
     let level = 0;
 
     let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
+    let firstItemElementWrapper = shallow(itemElements[0]);
+
     expect(itemElements).toBeDefined();
-    expect(itemElements.length).toEqual(1);
-    expect(true).toBeFalsy();
+    expect(itemElements.length).toEqual(3);
+
+    expect(firstItemElementWrapper).toBeDefined();
+    expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content active\"></div><ul class=\"test-class\"><li class=\"accordion-item\"><div class=\"accordion-item-content\"></div></li><li class=\"accordion-item\"><div class=\"accordion-item-content\"></div></li></ul></li>");
 });

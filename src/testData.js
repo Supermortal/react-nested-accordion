@@ -22,3 +22,15 @@ testData.set("Test 0-1-1", [
     { label: "Test 0-1-1-1" },
     { label: "Test 0-1-1-2" }
 ]);
+
+export const testDataArray = [
+    [
+        { label: "Test 0-1" },
+        { label: "Test 0-2" },
+        { label: "Test 0-3" }
+    ],   
+    [
+        { label: "Test 0-1-1" },
+        { label: "Test 0-1-2" }
+    ]
+];
