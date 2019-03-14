@@ -299,3 +299,74 @@ it('constructs nested item elements correctly', () => {
     expect(firstItemElementWrapper).toBeDefined();
     expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content active\"></div><ul class=\"test-class\"><li class=\"accordion-item\"><div class=\"accordion-item-content\"></div></li><li class=\"accordion-item\"><div class=\"accordion-item-content\"></div></li></ul></li>");
 });
+
+it('process on item click correctly', () => {
+
+    let testObject = {
+        onChange: () => {
+
+        },
+        onSecondClick: () => {
+
+        },
+        setSelectedIndicies: (selectedIndicies) => {
+
+        },
+        setItems: (items) => {
+
+        }
+    };
+
+    let onChangeSpy = jest.spyOn(testObject, 'onChange');
+    let onSecondClickSpy = jest.spyOn(testObject, 'onSecondClick');
+    let setSelectedIndiciesSpy = jest.spyOn(testObject, 'setSelectedIndicies');
+    let setItemsSpy = jest.spyOn(testObject, 'setItems');
+
+    let selectedIndicies = [];
+    let items = testDataArray;
+    let level = 0;
+    let index = 0;
+
+    let itemClickCallback = onItemClick(
+        testObject.onChange, 
+        testObject.onSecondClick, 
+        selectedIndicies, 
+        testObject.setSelectedIndicies, 
+        items, 
+        testObject.setItems, 
+        level,
+        index
+    );
+
+    expect(itemClickCallback).toBeDefined();
+
+    let fakeEvent = {};
+    itemClickCallback(fakeEvent);
+
+    expect(setSelectedIndiciesSpy).toHaveBeenCalled();
+    expect(setItemsSpy).toHaveBeenCalled();
+    expect(onChangeSpy).toHaveBeenCalled();
+    expect(onSecondClickSpy).not.toHaveBeenCalled();
+
+    selectedIndicies = [0];
+    index = 0;
+    level = 0;
+
+    itemClickCallback = onItemClick(
+        testObject.onChange, 
+        testObject.onSecondClick, 
+        selectedIndicies, 
+        testObject.setSelectedIndicies, 
+        items, 
+        testObject.setItems, 
+        level,
+        index
+    );
+
+    itemClickCallback(fakeEvent);
+
+    expect(setSelectedIndiciesSpy).toHaveBeenCalledTimes(1);
+    expect(setItemsSpy).toHaveBeenCalledTimes(1);
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    expect(onSecondClickSpy).toHaveBeenCalled();
+});
