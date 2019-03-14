@@ -142,12 +142,15 @@ it('creates item element correctly', () => {
     let isActive = false;
     let isLoading = false;
 
+
     let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
     let itemElementWrapper = shallow(itemElement);
 
     expect(itemElement).toBeDefined();
     expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div></li>");
 
+    getLoadingComponent = undefined;
+    isLoading = false;
     item = {
         label: "test-item-2"
     }
@@ -160,6 +163,58 @@ it('creates item element correctly', () => {
 
     expect(itemElement).toBeDefined();
     expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item-2</div></div><ul class=\"test-class\"><li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div></li></ul></li>");
+});
+
+it('sets item element as loading correctly during creation', () => {
+
+    let getItemContent = (item) => {
+        return (<div>{item.label}</div>);
+    };
+    let item = {
+        label: "test-item"
+    };
+    let index = 0;
+    let className = "test-class";
+    let onItemClickHandler = () => {
+
+    };
+    let childItemElements = undefined;
+    let isActive = false;
+
+    let getLoadingComponent = () => <div>Loading...</div>;
+    let isLoading = true;
+
+    let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    let itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div><div>Loading...</div></li>");
+});
+
+it('sets item element as active correctly during creation', () => {
+
+    let getItemContent = (item) => {
+        return (<div>{item.label}</div>);
+    };
+    let getLoadingComponent = undefined;
+    let item = {
+        label: "test-item"
+    };
+    let index = 0;
+    let className = "test-class";
+    let onItemClickHandler = () => {
+
+    };
+    let childItemElements = undefined;
+    let isActive = true;
+    let isLoading = false;
+
+
+    let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    let itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content active\"><div>test-item</div></div></li>");
 });
 
 it('constructs item elements correctly', () => {
@@ -182,7 +237,67 @@ it('constructs item elements correctly', () => {
             onSecondClick,
             getLoadingComponent
         };
-
         let selectedIndicies = [];
+        let setSelectedIndicies = (selectedIndicies) => {
 
+        };
+        let items = [
+            [
+                {
+                    label: "test-item"
+                }
+            ]
+        ];
+        let setItems = (items) => {
+
+        };
+        let loading = false;
+        let level = 0;
+
+        let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
+        expect(itemElements).toBeDefined();
+        expect(itemElements.length).toEqual(1);
+});
+
+it('constructs nested item elements correctly', () => {
+
+    let getItemContent = (item) => {
+
+    };
+    let className = "test-class";
+    let onChange = (item) => {
+
+    };
+    let onSecondClick = (item) => {
+
+    };
+    let getLoadingComponent = undefined;
+    let props = {
+        getItemContent,
+        className,
+        onChange,
+        onSecondClick,
+        getLoadingComponent
+    };
+    let selectedIndicies = [];
+    let setSelectedIndicies = (selectedIndicies) => {
+
+    };
+    let items = [
+        [
+            {
+                label: "test-item"
+            }
+        ]
+    ];
+    let setItems = (items) => {
+
+    };
+    let loading = false;
+    let level = 0;
+
+    let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
+    expect(itemElements).toBeDefined();
+    expect(itemElements.length).toEqual(1);
+    expect(true).toBeFalsy();
 });
