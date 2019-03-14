@@ -77,3 +77,49 @@ it('checks for second click correctly', () => {
 
     expect(isSecondClick).toBeFalsy();
 });
+
+it('cleans up array correctly', () => {
+
+    let array = [];
+    let level = 0;
+
+    array = cleanUpArray(array, level);
+
+    expect(array.length).toEqual(0);
+
+    array = [
+        [],
+        [],
+        []
+    ];
+
+    array = cleanUpArray(array, level);
+
+    expect(array.length).toEqual(1);
+
+    array = [
+        [],
+        [],
+        [],
+        []
+    ];
+
+    level = 2;
+
+    array = cleanUpArray(array, level);
+
+    expect(array.length).toEqual(3);
+
+    array = [
+        [],
+        [],
+        [],
+        []
+    ];
+
+    level = 1;
+
+    array = cleanUpArray(array, level);
+
+    expect(array.length).toEqual(2);
+});
