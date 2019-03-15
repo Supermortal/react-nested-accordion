@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import uuidv4 from 'uuid/v4';
 import logo from './logo.svg';
 import './App.css';
 
@@ -6,6 +7,14 @@ import NestedAccordion from './NestedAccordion';
 import { testData } from './testData';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      accordionId: uuidv4()
+    }
+  }
 
   getItems(item, resolve, reject) {
     setTimeout(() => {
@@ -30,10 +39,18 @@ class App extends Component {
     }
   }
 
+  onAccordionClear() {
+    return e => {
+      this.setState({ accordionId: uuidv4() });
+    };
+  }
+
   render() {
     return (
       <div className="App">
+        <button onClick={this.onAccordionClear()}>Clear</button>
         <NestedAccordion
+          key={this.state.accordionId}
           getItems={this.getItems}
           onChange={this.onChange()}
           getLoadingComponent={
