@@ -80,6 +80,7 @@ export const onItemClick = (onChange, onSecondClick, selectedIndicies, setSelect
                 return;
             }
 
+            if (onChange) onChange(null);
             setItems([[]]);
             setSelectedIndicies([null]);
             return;
@@ -103,7 +104,8 @@ export default function NestedAccordion(props) {
     const { 
         className,
         getItems,
-        getLoadingComponent
+        getLoadingComponent,
+        getItemIsLeaf
     } = props;
 
     const [items, setItems] = useState([[]]);
@@ -136,6 +138,11 @@ export default function NestedAccordion(props) {
 
         const getLevel = (selectedIndicies[0] === null) ? 0 : currentLevel + 1;
 
+        if (getItemIsLeaf && currentItem) {
+            const itemIsLeaf = getItemIsLeaf(currentItem);
+            if (itemIsLeaf) return;
+        }
+
         setLoading({ index: currentSelectedIndex, level: currentLevel });
         getItemsCall(currentItem, getLevel);
     }, [selectedIndicies]);
@@ -156,5 +163,6 @@ NestedAccordion.propTypes = {
     className: PropTypes.string,
     onChange: PropTypes.func,
     onSecondClick: PropTypes.func,
-    getLoadingComponent: PropTypes.func
+    getLoadingComponent: PropTypes.func,
+    getItemIsLeaf: PropTypes.func
 };

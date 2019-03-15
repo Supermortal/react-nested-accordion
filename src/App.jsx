@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import uuidv4 from 'uuid/v4';
-import logo from './logo.svg';
 import './App.css';
 
 import NestedAccordion from './NestedAccordion';
@@ -33,6 +32,10 @@ class App extends Component {
     );
   }
 
+  getItemIsLeaf(item) {
+    return item.isLeaf;
+  }
+
   onChange() {
     return item => {
       console.log(item);
@@ -52,6 +55,7 @@ class App extends Component {
         <NestedAccordion
           key={this.state.accordionId}
           getItems={this.getItems}
+          getItemIsLeaf={this.getItemIsLeaf}
           onChange={this.onChange()}
           getLoadingComponent={
             () => (<div>Loading...</div>)
