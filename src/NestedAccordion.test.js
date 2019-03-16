@@ -4,8 +4,14 @@ import ReactDOM from 'react-dom';
 import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import NestedAccordion from './NestedAccordion';
-import { testData } from './testData';
+import NestedAccordion, { 
+    checkForSecondClick,
+    cleanUpArray,
+    constructItemElements,
+    createItemElement,
+    onItemClick
+} from './NestedAccordion';
+import { testDataArray } from './testData';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -20,6 +26,19 @@ it('renders without crashing', () => {
     const div = document.createElement('div');
     ReactDOM.render(<NestedAccordion getItems={getItems} getItemContent={getItemContent} />, div);
     ReactDOM.unmountComponentAtNode(div);
+});
+
+it('has correct initial html', () => {
+    const getItems = (item) => {
+
+    };
+    const getItemContent = (item) => {
+
+    };
+
+    const accordion = shallow(<NestedAccordion getItems={getItems} getItemContent={getItemContent} />);
+
+    expect(accordion.html()).toEqual("<ul class=\"nested-accordion\"></ul>");
 });
 
 it('calls get items on render', () => {
@@ -42,534 +61,312 @@ it('calls get items on render', () => {
     spy.mockRestore();
 });
 
-it('processes items correctly in initialGetItemsProcessing', () => {
-
-    const testItems = [
-        { label: "Test1" },
-        { label: "Test2" }
-    ];
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        }
-    };
-
-    const getItemContentSpy = jest.spyOn(testObject, 'getItemContent');
-
-    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    let stateObject = {
-        itemElements: [],
-        contents: []
-    };
-
-    stateObject = accordionInstance.initialGetItemsProcessing(testItems, stateObject)
-
-    expect(stateObject.itemElements).toBeDefined();
-    expect(stateObject.itemElements).toHaveLength(1);
-    expect(stateObject.itemElements[0]).toHaveLength(2);
-
-    const firstItemElement = stateObject.itemElements[0][0];
-    const firstItemElementWrapper = shallow(firstItemElement);
-    expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test1</p></div></li>");
-
-    const secondItemElement = stateObject.itemElements[0][1];
-    const secondItemElementWrapper = shallow(secondItemElement);
-    expect(secondItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test2</p></div></li>");
-
-    expect(getItemContentSpy).toBeCalledTimes(2);
-
-    expect(stateObject.contents).toBeDefined();
-    expect(stateObject.contents).toHaveLength(1);
-    expect(stateObject.contents[0]).toHaveLength(2);
-
-    const firstContent = stateObject.contents[0][0];
-    const firstContentWrapper = shallow(firstContent);
-    expect(firstContentWrapper.html()).toEqual("<p>Test1</p>");
-
-    const secondContent = stateObject.contents[0][1];
-    const secondContentWrapper = shallow(secondContent);
-    expect(secondContentWrapper.html()).toEqual("<p>Test2</p>");
-});
-
-it('preps element arrays correctly', () => {
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        }
-    };
-
-    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    const level = 0;
-    const initialItemElements = [];
-    const initialContents = [];
-
-    const {
-        itemElements,
-        contents
-    } = accordionInstance.prepElementArrays(initialItemElements, initialContents, level);
-
-    expect(itemElements).toHaveLength(1);
-    expect(itemElements[level]).toHaveLength(0);
-
-    expect(contents).toHaveLength(1);
-    expect(itemElements[level]).toHaveLength(0);
-
-    const newLevel = 1;
-
-    const updateObject = accordionInstance.prepElementArrays(itemElements, contents, newLevel);
-
-    expect(updateObject.itemElements).toHaveLength(2);
-    expect(updateObject.itemElements[newLevel]).toHaveLength(0);
-
-    expect(updateObject.contents).toHaveLength(2);
-    expect(updateObject.contents[newLevel]).toHaveLength(0);
-});
-
-it('creates item element correctly', () => {
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        }
-    };
-
-    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    const item = {
-        label: "Test Item"
-    };
-    const index = 0;
-    const level = 0;
-    const content = shallow(<p>Test Item</p>);
-
-    const itemElement = accordionInstance.createItemElement(item, index, level, content);
-    const itemElementWrapper = shallow(itemElement);
-
-    expect(itemElement).toBeDefined();
-    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test Item</p></div></li>");
-});
-
-it('creates item elements correctly', () => {
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        }
-    };
-
-    const accordion = shallow(<NestedAccordion getItems={testObject.getItems} getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    const items = [
-        { label: "Test Item 1" },
-        { label: "Test Item 2" },
-        { label: "Test Item 3" },
-        { label: "Test Item 4" }
-    ];
-
-    const initialContents = [
-        []
-    ];
-
-    const initialItemElements = [
-        []
-    ];
-
-    const level = 0;
-
-    const { itemElements, contents } = accordionInstance.createItemElements(items, initialItemElements, initialContents, level);
-
-    expect(itemElements).toBeDefined();
-    expect(itemElements).toHaveLength(1);
-    expect(itemElements[level]).toHaveLength(4);
-
-    const firstItemElement = itemElements[level][0];
-    expect(firstItemElement).toBeDefined();
-    const firstItemElementWrapper = shallow(firstItemElement);
-    expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test Item 1</p></div></li>");
-
-    expect(contents).toBeDefined();
-    expect(contents).toHaveLength(1);
-    expect(contents[level]).toHaveLength(4);
-
-    const firstContent = contents[level][0];
-    expect(firstContent).toBeDefined();
-    const firstContentWrapper = shallow(firstContent);
-    expect(firstContentWrapper.html()).toEqual("<p>Test Item 1</p>");
-});
-
 it('checks for second click correctly', () => {
 
-    const testObject = {
-        getItems(item, resolve, reject) {
+    let selectedIndicies = [0, 1];
+    let index = 1;
+    let level = 1;
 
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        },
-        onChange(item) {
+    let isSecondClick = checkForSecondClick(selectedIndicies, index, level);
 
-        }
-    };
-
-    const accordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        onChange={testObject.onChange}
-        getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    const index = 0;
-    const level = 0;
-    const selectedIndicies = [];
-    selectedIndicies[level] = index;
-
-    let isSecondClick = accordionInstance.isSecondClick(selectedIndicies, index, level);
     expect(isSecondClick).toBeTruthy();
 
-    const otherIndex = 1;
-    selectedIndicies[level] = otherIndex;
+    index = 2;
 
-    isSecondClick = accordionInstance.isSecondClick(selectedIndicies, index, level);
+    isSecondClick = checkForSecondClick(selectedIndicies, index, level);
+
     expect(isSecondClick).toBeFalsy();
-});
-
-it('handles second click correctly', () => {
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        },
-        onChange(item) {
-
-        }
-    };
-
-    const onChangeSpy = jest.spyOn(testObject, 'onChange');
-    const clearAllSpy = jest.spyOn(NestedAccordion.prototype, 'clearAll');
-
-    const accordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        onChange={testObject.onChange}
-        getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    const index = 0;
-    const level = 0;
-    const selectedIndicies = [];
-    selectedIndicies[level] = index;
-
-    let hasSecondClick = accordionInstance.handleSecondClick(selectedIndicies, index, level);
-
-    expect(onChangeSpy).toBeCalledTimes(1);
-    expect(clearAllSpy).toBeCalledTimes(1);
-    expect(hasSecondClick).toBeTruthy();
-
-    const otherIndex = 1;
-    selectedIndicies[level] = otherIndex;
-
-    hasSecondClick = accordionInstance.handleSecondClick(selectedIndicies, index, level);
-
-    expect(onChangeSpy).toBeCalledTimes(1);
-    expect(clearAllSpy).toBeCalledTimes(1);
-    expect(hasSecondClick).toBeFalsy();
-
-    const newAccordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        getItemContent={testObject.getItemContent} />);
-    const newAccordionInstance = newAccordion.instance();
-
-    selectedIndicies[level] = index;
-
-    hasSecondClick = newAccordionInstance.handleSecondClick(selectedIndicies, index, level);
-
-    expect(onChangeSpy).toBeCalledTimes(1);
-    expect(clearAllSpy).toBeCalledTimes(2);
-    expect(hasSecondClick).toBeTruthy();
 });
 
 it('cleans up array correctly', () => {
 
-    const testItems = [
-        { label: "Test1" },
-        { label: "Test2" },
-        { label: "Test3" },
-        { label: "Test4" },
-        { label: "Test5" },
-        { label: "Test6" }
+    let array = [];
+    let level = 0;
+
+    array = cleanUpArray(array, level);
+
+    expect(array.length).toEqual(0);
+
+    array = [
+        [],
+        [],
+        []
     ];
 
-    const testObject = {
-        getItems(item, resolve, reject) {
+    array = cleanUpArray(array, level);
 
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        },
-        onChange(item) {
+    expect(array.length).toEqual(1);
 
-        }
-    };
+    array = [
+        [],
+        [],
+        [],
+        []
+    ];
 
-    const accordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        onChange={testObject.onChange}
-        getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
+    level = 2;
 
-    let array = [
-        testItems,
-        testItems,
-        testItems,
-        testItems,
-        testItems
-    ]
-    const level = 1;
+    array = cleanUpArray(array, level);
 
-    array = accordionInstance.cleanUpArray(array, level);
+    expect(array.length).toEqual(3);
 
-    expect(array).toBeDefined();
-    expect(array).toHaveLength(2);
+    array = [
+        [],
+        [],
+        [],
+        []
+    ];
 
+    level = 1;
+
+    array = cleanUpArray(array, level);
+
+    expect(array.length).toEqual(2);
 });
 
-it('cleans up old items correctly', () => {
+it('creates item element correctly', () => {
 
-    const testItems = [
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test1</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test2</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test3</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test4</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test5</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test6</p></div></li>)
-    ];
-
-    const testItems2 = [
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test7</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test8</p></div></li>),
-        (<li class="accordion-item"><div class="accordion-item-content"><p>Test9</p></div>
-            <ul>
-                <li class="accordion-item"><div class="accordion-item-content"><p>Test10</p></div></li>
-                <li class="accordion-item"><div class="accordion-item-content"><p>Test11</p></div></li>
-                <li class="accordion-item"><div class="accordion-item-content"><p>Test12</p></div></li>
-            </ul>
-        </li>),
-    ];
-
-    const testContents = [
-        (<p>Test1</p>),
-        (<p>Test2</p>),
-        (<p>Test3</p>),
-        (<p>Test4</p>),
-        (<p>Test5</p>),
-        (<p>Test6</p>)
-    ];
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        },
-        onChange(item) {
-
-        }
+    let getItemContent = (item) => {
+        return (<div>{item.label}</div>);
     };
+    let getLoadingComponent = undefined;
+    let item = {
+        label: "test-item"
+    };
+    let index = 0;
+    let className = "test-class";
+    let onItemClickHandler = () => {
 
-    const accordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        onChange={testObject.onChange}
-        getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
+    };
+    let childItemElements = undefined;
+    let isActive = false;
+    let isLoading = false;
 
-    const itemElements = [
-        testItems,
-        testItems2,
-        testItems,
-        testItems,
-        testItems
+
+    let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    let itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div></li>");
+
+    getLoadingComponent = undefined;
+    isLoading = false;
+    item = {
+        label: "test-item-2"
+    }
+    childItemElements = [
+        itemElement
     ];
-    const contents = [
-        testContents,
-        testContents,
-        testContents,
-        testContents,
-        testContents
-    ];
-    const storedItems = [
-        { label: "Test1" },
-        { label: "Test2" }
-    ];
-    const selectedIndicies = [
-        1,
-        2
-    ];
-    const level = 1;
 
-    const originalElement = itemElements[1][2];
-    const originalElementWrapper = shallow(originalElement);
+    itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    itemElementWrapper = shallow(itemElement);
 
-    expect(originalElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test9</p></div><ul><li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test10</p></div></li><li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test11</p></div></li><li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test12</p></div></li></ul></li>");
-
-    let returnObject = accordionInstance.cleanUpOldItemElements(itemElements, contents, storedItems, selectedIndicies, level);
-
-    expect(returnObject).toBeDefined();
-
-    expect(returnObject.itemElements).toBeDefined();
-    expect(returnObject.itemElements).toHaveLength(2);
-
-    expect(returnObject.contents).toBeDefined();
-    expect(returnObject.contents).toHaveLength(2);
-
-    const replacementElement = returnObject.itemElements[1][2];
-    expect(replacementElement).toBeDefined();
-
-    const replacementElementWrapper = shallow(replacementElement);
-    expect(replacementElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><p>Test3</p></div></li>");
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item-2</div></div><ul class=\"test-class\"><li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div></li></ul></li>");
 });
 
-it('sets selected index correctly', () => {
+it('sets item element as loading correctly during creation', () => {
 
-    const testObject = {
-        getItems(item, resolve, reject) {
+    let getItemContent = (item) => {
+        return (<div>{item.label}</div>);
+    };
+    let item = {
+        label: "test-item"
+    };
+    let index = 0;
+    let className = "test-class";
+    let onItemClickHandler = () => {
+
+    };
+    let childItemElements = undefined;
+    let isActive = false;
+
+    let getLoadingComponent = () => <div>Loading...</div>;
+    let isLoading = true;
+
+    let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    let itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content\"><div>test-item</div></div><div>Loading...</div></li>");
+});
+
+it('sets item element as active correctly during creation', () => {
+
+    let getItemContent = (item) => {
+        return (<div>{item.label}</div>);
+    };
+    let getLoadingComponent = undefined;
+    let item = {
+        label: "test-item"
+    };
+    let index = 0;
+    let className = "test-class";
+    let onItemClickHandler = () => {
+
+    };
+    let childItemElements = undefined;
+    let isActive = true;
+    let isLoading = false;
+
+
+    let itemElement = createItemElement(getItemContent, getLoadingComponent, item, index, className, onItemClickHandler, childItemElements, isActive, isLoading);
+    let itemElementWrapper = shallow(itemElement);
+
+    expect(itemElement).toBeDefined();
+    expect(itemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content active\"><div>test-item</div></div></li>");
+});
+
+it('constructs item elements correctly', () => {
+
+        let getItemContent = (item) => {
+
+        };
+        let className = "test-class";
+        let onChange = (item) => {
+
+        };
+        let onSecondClick = (item) => {
+
+        };
+        let getLoadingComponent = undefined;
+        let props = {
+            getItemContent,
+            className,
+            onChange,
+            onSecondClick,
+            getLoadingComponent
+        };
+        let selectedIndicies = [];
+        let setSelectedIndicies = (selectedIndicies) => {
+
+        };
+        let items = [
+            [
+                {
+                    label: "test-item"
+                }
+            ]
+        ];
+        let setItems = (items) => {
+
+        };
+        let loading = false;
+        let level = 0;
+
+        let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
+        expect(itemElements).toBeDefined();
+        expect(itemElements.length).toEqual(1);
+});
+
+it('constructs nested item elements correctly', () => {
+
+    let getItemContent = (item) => {
+
+    };
+    let className = "test-class";
+    let onChange = (item) => {
+
+    };
+    let onSecondClick = (item) => {
+
+    };
+    let getLoadingComponent = undefined;
+    let props = {
+        getItemContent,
+        className,
+        onChange,
+        onSecondClick,
+        getLoadingComponent
+    };
+    let selectedIndicies = [0];
+    let setSelectedIndicies = (selectedIndicies) => {
+
+    };
+    let items = testDataArray;
+    let setItems = (items) => {
+
+    };
+    let loading = false;
+    let level = 0;
+
+    let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
+    let firstItemElementWrapper = shallow(itemElements[0]);
+
+    expect(itemElements).toBeDefined();
+    expect(itemElements.length).toEqual(3);
+
+    expect(firstItemElementWrapper).toBeDefined();
+    expect(firstItemElementWrapper.html()).toEqual("<li class=\"accordion-item\"><div class=\"accordion-item-content active\"></div><ul class=\"test-class\"><li class=\"accordion-item\"><div class=\"accordion-item-content\"></div></li><li class=\"accordion-item\"><div class=\"accordion-item-content\"></div></li></ul></li>");
+});
+
+it('process on item click correctly', () => {
+
+    let testObject = {
+        onChange: () => {
 
         },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
+        onSecondClick: () => {
+
         },
-        onChange(item) {
+        setSelectedIndicies: (selectedIndicies) => {
+
+        },
+        setItems: (items) => {
 
         }
     };
 
-    const accordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        onChange={testObject.onChange}
-        getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
+    let onChangeSpy = jest.spyOn(testObject, 'onChange');
+    let onSecondClickSpy = jest.spyOn(testObject, 'onSecondClick');
+    let setSelectedIndiciesSpy = jest.spyOn(testObject, 'setSelectedIndicies');
+    let setItemsSpy = jest.spyOn(testObject, 'setItems');
 
     let selectedIndicies = [];
+    let items = testDataArray;
+    let level = 0;
     let index = 0;
-    let level = 0;
 
-    selectedIndicies = accordionInstance.setSelectedIndex(selectedIndicies, index, level);
+    let itemClickCallback = onItemClick(
+        testObject.onChange, 
+        testObject.onSecondClick, 
+        selectedIndicies, 
+        testObject.setSelectedIndicies, 
+        items, 
+        testObject.setItems, 
+        level,
+        index
+    );
 
-    expect(selectedIndicies).toBeDefined();
-    expect(selectedIndicies).toHaveLength(1);
-    expect(selectedIndicies[level]).toEqual(index);
+    expect(itemClickCallback).toBeDefined();
 
-    index = 13;
-    level = 1;
+    let fakeEvent = {};
+    itemClickCallback(fakeEvent);
 
-    selectedIndicies = accordionInstance.setSelectedIndex(selectedIndicies, index, level);
+    expect(setSelectedIndiciesSpy).toHaveBeenCalled();
+    expect(setItemsSpy).toHaveBeenCalled();
+    expect(onChangeSpy).toHaveBeenCalled();
+    expect(onSecondClickSpy).not.toHaveBeenCalled();
 
-    expect(selectedIndicies).toHaveLength(2);
-    expect(selectedIndicies[level]).toEqual(index);
-
-    index = 18
+    selectedIndicies = [0];
+    index = 0;
     level = 0;
 
-    selectedIndicies = accordionInstance.setSelectedIndex(selectedIndicies, index, level);
+    itemClickCallback = onItemClick(
+        testObject.onChange, 
+        testObject.onSecondClick, 
+        selectedIndicies, 
+        testObject.setSelectedIndicies, 
+        items, 
+        testObject.setItems, 
+        level,
+        index
+    );
 
-    expect(selectedIndicies).toHaveLength(1);
-    expect(selectedIndicies[level]).toEqual(index);
+    itemClickCallback(fakeEvent);
+
+    expect(setSelectedIndiciesSpy).toHaveBeenCalledTimes(1);
+    expect(setItemsSpy).toHaveBeenCalledTimes(1);
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    expect(onSecondClickSpy).toHaveBeenCalled();
 });
-
-it('sets stored item correctly', () => {
-
-    const testObject = {
-        getItems(item, resolve, reject) {
-
-        },
-        getItemContent(item) {
-            return (
-                <p>{item.label}</p>
-            );
-        },
-        onChange(item) {
-
-        }
-    };
-
-    const accordion = shallow(<NestedAccordion
-        getItems={testObject.getItems}
-        onChange={testObject.onChange}
-        getItemContent={testObject.getItemContent} />);
-    const accordionInstance = accordion.instance();
-
-    let storedItems = [];
-    let item = {
-        label: "Test 1"
-    };
-    let level = 0;
-
-    storedItems = accordionInstance.setStoredItem(storedItems, item, level);
-
-    expect(storedItems).toBeDefined();
-    expect(storedItems).toHaveLength(1);
-    expect(storedItems[level]).toEqual(item);
-
-    item = {
-        label: "Test 2"
-    }
-    level = 1;
-
-    storedItems = accordionInstance.setStoredItem(storedItems, item, level);
-
-    expect(storedItems).toHaveLength(2);
-    expect(storedItems[level]).toEqual(item);
-
-    item = {
-        label: "Test 3"
-    }
-    level = 0;
-
-    storedItems = accordionInstance.setStoredItem(storedItems, item, level);
-
-    expect(storedItems).toHaveLength(1);
-    expect(storedItems[level]).toEqual(item);
-});
-
-// it('replaces old elements correctly', () => {
-//     expect(false).toBeTruthy();
-// });
