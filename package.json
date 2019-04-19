@@ -10,7 +10,8 @@
     "dynamic"
   ],
   "scripts": {
-    "build": "webpack --config webpack.production.config.js"
+    "build": "webpack --config webpack.production.config.js",
+    "test": "node scripts/testSetup.js"
   },
   "author": "Christopher Pink",
   "license": "MIT",
@@ -21,10 +22,10 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
-    "babel-plugin-react-hot-loader": "^3.0.0-beta.6",
     "aspnet-webpack": "^3.0.0",
     "aspnet-webpack-react": "^4.0.0",
     "babel-loader": "^8.0.5",
+    "babel-plugin-react-hot-loader": "^3.0.0-beta.6",
     "classnames": "^2.2.6",
     "css-loader": "^2.1.0",
     "jquery": "^3.3.1",
@@ -40,5 +41,11 @@
     "webpack-cli": "^3.2.1",
     "webpack-dev-middleware": "^3.4.0",
     "webpack-hot-middleware": "^2.24.3"
+  },
+  "devDependencies": {
+    "babel-preset-react-app": "^7.0.2",
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.12.1",
+    "jest": "^24.7.1"
   }
 }

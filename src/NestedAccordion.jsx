@@ -112,6 +112,7 @@ export default function NestedAccordion(props) {
     const [selectedIndicies, setSelectedIndicies] = useState([null]);
     const [loading, setLoading] = useState({ index: null, level: null });
 
+    /* https://www.robinwieruch.de/react-hooks-fetch-data/ */
     const getItemsCall = async (item, level) => {
         const getItemsPromise = new Promise((resolve, reject) => {
             getItems(item, resolve, reject);
