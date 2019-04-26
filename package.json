@@ -10,7 +10,7 @@
     "dynamic"
   ],
   "scripts": {
-    "build": "webpack --config webpack.production.config.js",
+    "build": "node scripts/build.js",
     "test": "node scripts/testSetup.js"
   },
   "author": "Christopher Pink",
@@ -26,10 +26,13 @@
     "aspnet-webpack-react": "^4.0.0",
     "babel-loader": "^8.0.5",
     "babel-plugin-react-hot-loader": "^3.0.0-beta.6",
+    "bfj": "^6.1.1",
     "classnames": "^2.2.6",
     "css-loader": "^2.1.0",
+    "fs-extra": "^7.0.1",
     "jquery": "^3.3.1",
     "react": "^16.6.3",
+    "react-dev-utils": "^9.0.0",
     "react-dom": "^16.6.3",
     "react-hot-loader": "^4.3.12",
     "react-transition-group": "^2.5.2",
