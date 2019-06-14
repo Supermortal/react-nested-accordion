@@ -8,12 +8,12 @@ const pkg = require('./package.json')
 
 module.exports = {
   title: `${pkg.name} v${pkg.version}`,
-  components: 'src/lib/components/**/[A-Z]*.js',
+  components: 'src/lib/components/**/[A-Z]*.jsx',
   moduleAliases: {
     [pkg.name]: path.resolve(__dirname, 'src/lib'),
   },
   ribbon: {
-    url: 'https://github.com/KaiHotz/react-rollup-boilerplate',
+    url: 'https://github.com/Supermortal/react-nested-accordion',
     text: 'Fork me on GitHub',
   },
   showSidebar: true,
