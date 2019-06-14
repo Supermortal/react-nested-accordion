@@ -2,6 +2,12 @@
   "name": "react-nested-accordion",
   "version": "1.0.0",
   "description": "Dynamic accordion for React, with a focus on nesting",
+  "keywords": [
+    "react",
+    "nested",
+    "accordion",
+    "dynamic"
+  ],
   "author": "Christopher Pink",
   "license": "MIT",
   "repository": {

@@ -1,2 +1,2 @@
 // export { default as Button } from './components/Button'
-export { default as NestedAccordion } from './components/NestedAccordion.jsx';
+export { default as NestedAccordion } from './components/NestedAccordion/NestedAccordion.jsx';
