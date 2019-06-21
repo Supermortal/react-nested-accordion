@@ -1,16 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Enzyme, { shallow, mount } from 'enzyme';
+import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import NestedAccordion, { 
-    checkForSecondClick,
-    cleanUpArray,
-    constructItemElements,
-    createItemElement,
-    onItemClick
-} from './NestedAccordion';
+import NestedAccordion from './NestedAccordion';
+import { checkForSecondClick, cleanUpArray, constructItemElements, createItemElement, onItemClick } from './nestedAccordionLogic';
 import { testDataArray } from './testData';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -219,44 +214,44 @@ it('sets item element as active correctly during creation', () => {
 
 it('constructs item elements correctly', () => {
 
-        let getItemContent = (item) => {
+    let getItemContent = (item) => {
 
-        };
-        let className = "test-class";
-        let onChange = (item) => {
+    };
+    let className = "test-class";
+    let onChange = (item) => {
 
-        };
-        let onSecondClick = (item) => {
+    };
+    let onSecondClick = (item) => {
 
-        };
-        let getLoadingComponent = undefined;
-        let props = {
-            getItemContent,
-            className,
-            onChange,
-            onSecondClick,
-            getLoadingComponent
-        };
-        let selectedIndicies = [];
-        let setSelectedIndicies = (selectedIndicies) => {
+    };
+    let getLoadingComponent = undefined;
+    let props = {
+        getItemContent,
+        className,
+        onChange,
+        onSecondClick,
+        getLoadingComponent
+    };
+    let selectedIndicies = [];
+    let setSelectedIndicies = (selectedIndicies) => {
 
-        };
-        let items = [
-            [
-                {
-                    label: "test-item"
-                }
-            ]
-        ];
-        let setItems = (items) => {
+    };
+    let items = [
+        [
+            {
+                label: "test-item"
+            }
+        ]
+    ];
+    let setItems = (items) => {
 
-        };
-        let loading = false;
-        let level = 0;
+    };
+    let loading = false;
+    let level = 0;
 
-        let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
-        expect(itemElements).toBeDefined();
-        expect(itemElements.length).toEqual(1);
+    let itemElements = constructItemElements(props, selectedIndicies, setSelectedIndicies, items, setItems, loading, level);
+    expect(itemElements).toBeDefined();
+    expect(itemElements.length).toEqual(1);
 });
 
 it('constructs nested item elements correctly', () => {
@@ -328,12 +323,12 @@ it('process on item click correctly', () => {
     let index = 0;
 
     let itemClickCallback = onItemClick(
-        testObject.onChange, 
-        testObject.onSecondClick, 
-        selectedIndicies, 
-        testObject.setSelectedIndicies, 
-        items, 
-        testObject.setItems, 
+        testObject.onChange,
+        testObject.onSecondClick,
+        selectedIndicies,
+        testObject.setSelectedIndicies,
+        items,
+        testObject.setItems,
         level,
         index
     );
@@ -353,12 +348,12 @@ it('process on item click correctly', () => {
     level = 0;
 
     itemClickCallback = onItemClick(
-        testObject.onChange, 
-        testObject.onSecondClick, 
-        selectedIndicies, 
-        testObject.setSelectedIndicies, 
-        items, 
-        testObject.setItems, 
+        testObject.onChange,
+        testObject.onSecondClick,
+        selectedIndicies,
+        testObject.setSelectedIndicies,
+        items,
+        testObject.setItems,
         level,
         index
     );
