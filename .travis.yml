@@ -6,5 +6,6 @@ before_script:
 script:
   - yarn run test
   - yarn run build:rollup
+  - yarn publish --access public
 cache:
   yarn: true
