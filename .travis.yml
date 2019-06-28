@@ -4,6 +4,6 @@ node_js:
 before_script:
   - yarn install
 script:
-  - yarn run test:all
+  - yarn run test
 cache:
   yarn: true
