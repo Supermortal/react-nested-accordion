@@ -5,3 +5,5 @@ before_script:
   - yarn install
 script:
   - yarn run test:all
+cache:
+  yarn: true
