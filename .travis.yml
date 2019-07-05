@@ -1,10 +1,17 @@
 language: node_js
 node_js:
-  - "12"
+- '12'
 before_script:
-  - yarn install
+- yarn install
 script:
-  - yarn run test
-  - yarn run build:rollup
+- yarn run test
+- yarn run build:rollup
 cache:
   yarn: true
+deploy:
+  provider: npm
+  email: christopherbyronpink@yahoo.com
+  api_key:
+    secure: sLpK6QL3MGPqRkBI635/IEJnieHiu7HvV80QTjiH7/HPW35wIBk5lputrTkJgRvCeY1a2cPgo7WgOkGgo+pySm5PII+IPRK6FUUqMp//A5lPFbbxNn+ppRkAv7snrsvz8jjo99qlQT7AZs6nQJt3fV/ZRTYxJqVofZuEG3EQ+JjPgK60YeGF4RCD8qQU5mPUNOB2TuS3EvqFaLBtUMjGXu/ZLjrAmEpTudvUxj5Bi/KHMS0S16WBOXiQdmm3uym+fTZ9/7x2BGk/V5EE2Pbbwxvd1v+ecB5E8R/9eOC51mQhA8rwuqN2aNs/kdqXsXUcBX+tTbqWrIEtUWFqkSmPQ92n9KvVGJHahI5EQcTdI8mWvyOWnhA5RW3CjhWfoaWhIyaJ8PL0okR80zYDLx8YZuIMPMElc0Df1r6D+GT3kop4KN7O4eCYr9oEtI91VCSPYFieAb9Z0IuKeQ7MQyQkVcCmBZasryuBIFDwK9rGrv1hAFN6rDiJnOrxTejNkEjfkHpOf3pkKgC8xk+qkLABTI+IU7IBZilPEtNi16Qi0TpzOiCwJMJPhvC8p72kons+iPcvBWjCsVvDEmNNZnf5DiEHX4tJlXqYuwQJuf2+G/cXZoi3Dv3Y6VOatBF18PeJQ0Ucv9kCAX3aB7vcihhSEo2TZFqt8LEbVUdRprjC6D8=
+  on:
+    repo: Supermortal/react-nested-accordion
