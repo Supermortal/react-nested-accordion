@@ -5,6 +5,8 @@
 ![](https://david-dm.org/Supermortal/react-nested-accordion/peer-status.svg)
 [![npm version](https://badge.fury.io/js/react-nested-accordion.svg)](https://badge.fury.io/js/react-nested-accordion)
 
+[https://github.com/Supermortal/react-nested-accordion](https://github.com/Supermortal/react-nested-accordion)
+
 ## Example Test Data
 
 ```
